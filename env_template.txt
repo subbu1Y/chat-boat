@@ -1,0 +1,22 @@
+# LLM Provider Configuration
+# Choose one: "grok", "openai", or "groq"
+LLM_PROVIDER=groq
+
+# Grok API Configuration (requires credits)
+# Get your API key from: https://console.x.ai/
+GROK_API_KEY=your_grok_api_key_here
+
+# OpenAI API Configuration (free trial credits available)
+# Get your API key from: https://platform.openai.com/api-keys
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Groq API Configuration (FREE tier available - RECOMMENDED!)
+# Get your API key from: https://console.groq.com/keys
+GROQ_API_KEY=your_groq_api_key_here
+
+# Instructions:
+# 1. Choose your LLM_PROVIDER (groq is free and fast!)
+# 2. Add the corresponding API key
+# 3. Save this file as ".env" (without .txt extension)
+# 4. Restart your Streamlit app
+

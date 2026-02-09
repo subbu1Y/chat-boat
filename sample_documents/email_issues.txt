@@ -1,0 +1,103 @@
+OUTLOOK ISSUES – QUESTIONS AND ANSWERS (IT OPERATIONS)
+ 
+Q1. Outlook is not opening and stuck on “Loading Profile”. What is the
+issue? A. This usually happens due to a corrupted Outlook profile,
+damaged OST/PST file, faulty add-ins, or cached credential issues.
+ 
+Q2. How can this issue be resolved? A. Start Outlook in Safe Mode,
+disable add-ins, create a new Outlook profile, delete and recreate the
+OST file, and clear saved credentials from Credential Manager.
+ 
+------------------------------------------------------------------------
+ 
+Q3. User is unable to send or receive emails. What could be the reason?
+A. Common reasons include network connectivity issues, mailbox quota
+being full, Exchange or Office 365 service outage, or incorrect SMTP
+settings.
+ 
+Q4. What steps should IT take to fix send/receive issues? A. Check
+internet/VPN connectivity, verify mailbox size, test access using
+Outlook Web Access (OWA), restart Outlook, and verify mail server
+settings.
+ 
+------------------------------------------------------------------------
+ 
+Q5. Outlook is freezing or crashing frequently. Why does this happen? A.
+This happens due to problematic add-ins, large mailboxes or PST files,
+antivirus scanning Outlook files, or low system resources.
+ 
+Q6. What is the solution for Outlook crashing issues? A. Disable
+unnecessary add-ins, archive old emails, exclude Outlook files from
+antivirus scans, update Outlook and Windows, and check system
+performance.
+ 
+------------------------------------------------------------------------
+ 
+Q7. Outlook search is not working properly. What causes this? A. This is
+caused by Windows indexing issues, corrupted search index, or OST/PST
+files not being indexed correctly.
+ 
+Q8. How can Outlook search issues be fixed? A. Rebuild the Windows
+Search Index, ensure Outlook is included in indexing options, restart
+Windows Search service, or recreate the OST file.
+ 
+------------------------------------------------------------------------
+ 
+Q9. Outlook shows “Disconnected” or “Trying to connect”. What does this
+mean? A. This indicates network issues, VPN problems, Exchange server
+connectivity issues, or Outlook working in offline mode.
+ 
+Q10. How do you resolve Outlook disconnected issues? A. Check network
+and VPN, disable Work Offline mode, restart Outlook, test connectivity
+using OWA, and recreate the Outlook profile if needed.
+ 
+------------------------------------------------------------------------
+ 
+Q11. Shared mailbox or calendar is not syncing. What is the reason? A.
+Incorrect permissions, cached mode limitations, or Exchange
+synchronization delays can cause this issue.
+ 
+Q12. What is the solution for shared mailbox or calendar issues? A.
+Verify permissions, re-add the shared mailbox, enable “Download shared
+folders” in Cached Mode, and test in OWA.
+ 
+------------------------------------------------------------------------
+ 
+Q13. User cannot open or send email attachments. What could be wrong? A.
+Outlook security settings, blocked file types, antivirus interference,
+or attachment size limits can cause this issue.
+ 
+Q14. How can attachment-related issues be fixed? A. Check Trust Center
+settings, rename blocked file extensions if required, temporarily
+disable antivirus for testing, and use OneDrive or SharePoint links for
+large files.
+ 
+------------------------------------------------------------------------
+ 
+Q15. Outlook keeps asking for the password repeatedly. Why? A. This
+occurs due to cached credential mismatch, recent password changes, MFA
+issues, or a corrupted Outlook profile.
+ 
+Q16. What is the solution for repeated password prompts? A. Clear saved
+credentials, re-enter the password, re-authenticate MFA, and recreate
+the Outlook profile if necessary.
+ 
+------------------------------------------------------------------------
+ 
+Q17. Outlook data file (PST/OST) is corrupted. What causes this? A.
+Improper system shutdowns, disk errors, oversized PST files, or sudden
+Outlook crashes.
+ 
+Q18. How do you fix PST or OST corruption? A. Run SCANPST.exe, create a
+new PST/OST file, reduce mailbox size, and ensure proper shutdown and
+backups.
+ 
+------------------------------------------------------------------------
+ 
+Q19. Outlook performance is very slow. What is the reason? A. Large
+mailboxes, too many shared mailboxes, excessive inbox rules, and
+multiple add-ins can slow down Outlook.
+ 
+Q20. How can Outlook performance be improved? A. Enable online
+archiving, reduce cached shared mailboxes, clean up inbox rules, and
+disable unused add-ins.

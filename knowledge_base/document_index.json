@@ -1,0 +1,310 @@
+[
+  {
+    "id": 0,
+    "text": "OUTLOOK ISSUES – QUESTIONS AND ANSWERS (IT OPERATIONS)\n \nQ1. Outlook is not opening and stuck on “Loading Profile”. What is the\nissue? A. This usually happens due to a corrupted Outlook profile,\ndamaged OST/PST file, faulty add-ins, or cached credential issues.\n \nQ2. How can this issue be resolved? A. Start Outlook in Safe Mode,\ndisable add-ins, create a new Outlook profile, delete and recreate the\nOST file, and clear saved credentials from Credential Manager.\n \n---------------------------------",
+    "source": "email_issues.txt",
+    "start_pos": 0,
+    "end_pos": 500
+  },
+  {
+    "id": 1,
+    "text": "ntial Manager.\n \n------------------------------------------------------------------------\n \nQ3. User is unable to send or receive emails. What could be the reason?\nA. Common reasons include network connectivity issues, mailbox quota\nbeing full, Exchange or Office 365 service outage, or incorrect SMTP\nsettings.\n \nQ4. What steps should IT take to fix send/receive issues? A. Check\ninternet/VPN connectivity, verify mailbox size, test access using\nOutlook Web Access (OWA), restart Outlook, and verify",
+    "source": "email_issues.txt",
+    "start_pos": 450,
+    "end_pos": 950
+  },
+  {
+    "id": 2,
+    "text": "look Web Access (OWA), restart Outlook, and verify mail server\nsettings.\n \n------------------------------------------------------------------------\n \nQ5. Outlook is freezing or crashing frequently. Why does this happen? A.\nThis happens due to problematic add-ins, large mailboxes or PST files,\nantivirus scanning Outlook files, or low system resources.\n \nQ6. What is the solution for Outlook crashing issues? A. Disable\nunnecessary add-ins, archive old emails, exclude Outlook files from\nantivirus sc",
+    "source": "email_issues.txt",
+    "start_pos": 900,
+    "end_pos": 1400
+  },
+  {
+    "id": 3,
+    "text": "ld emails, exclude Outlook files from\nantivirus scans, update Outlook and Windows, and check system\nperformance.\n \n------------------------------------------------------------------------\n \nQ7. Outlook search is not working properly. What causes this? A. This is\ncaused by Windows indexing issues, corrupted search index, or OST/PST\nfiles not being indexed correctly.\n \nQ8. How can Outlook search issues be fixed? A. Rebuild the Windows\nSearch Index, ensure Outlook is included in indexing options, r",
+    "source": "email_issues.txt",
+    "start_pos": 1350,
+    "end_pos": 1850
+  },
+  {
+    "id": 4,
+    "text": "ensure Outlook is included in indexing options, restart\nWindows Search service, or recreate the OST file.\n \n------------------------------------------------------------------------\n \nQ9. Outlook shows “Disconnected” or “Trying to connect”. What does this\nmean? A. This indicates network issues, VPN problems, Exchange server\nconnectivity issues, or Outlook working in offline mode.\n \nQ10. How do you resolve Outlook disconnected issues? A. Check network\nand VPN, disable Work Offline mode, restart O",
+    "source": "email_issues.txt",
+    "start_pos": 1800,
+    "end_pos": 2300
+  },
+  {
+    "id": 5,
+    "text": "work\nand VPN, disable Work Offline mode, restart Outlook, test connectivity\nusing OWA, and recreate the Outlook profile if needed.\n \n------------------------------------------------------------------------\n \nQ11. Shared mailbox or calendar is not syncing. What is the reason? A.\nIncorrect permissions, cached mode limitations, or Exchange\nsynchronization delays can cause this issue.\n \nQ12. What is the solution for shared mailbox or calendar issues? A.\nVerify permissions, re-add the shared mailbox,",
+    "source": "email_issues.txt",
+    "start_pos": 2250,
+    "end_pos": 2750
+  },
+  {
+    "id": 6,
+    "text": "A.\nVerify permissions, re-add the shared mailbox, enable “Download shared\nfolders” in Cached Mode, and test in OWA.\n \n------------------------------------------------------------------------\n \nQ13. User cannot open or send email attachments. What could be wrong? A.\nOutlook security settings, blocked file types, antivirus interference,\nor attachment size limits can cause this issue.\n \nQ14. How can attachment-related issues be fixed? A. Check Trust Center\nsettings, rename blocked file extensions",
+    "source": "email_issues.txt",
+    "start_pos": 2700,
+    "end_pos": 3200
+  },
+  {
+    "id": 7,
+    "text": "t Center\nsettings, rename blocked file extensions if required, temporarily\ndisable antivirus for testing, and use OneDrive or SharePoint links for\nlarge files.\n \n------------------------------------------------------------------------\n \nQ15. Outlook keeps asking for the password repeatedly. Why? A. This\noccurs due to cached credential mismatch, recent password changes, MFA\nissues, or a corrupted Outlook profile.\n \nQ16. What is the solution for repeated password prompts? A. Clear saved\ncredential",
+    "source": "email_issues.txt",
+    "start_pos": 3150,
+    "end_pos": 3650
+  },
+  {
+    "id": 8,
+    "text": "peated password prompts? A. Clear saved\ncredentials, re-enter the password, re-authenticate MFA, and recreate\nthe Outlook profile if necessary.\n \n------------------------------------------------------------------------\n \nQ17. Outlook data file (PST/OST) is corrupted. What causes this? A.\nImproper system shutdowns, disk errors, oversized PST files, or sudden\nOutlook crashes.\n \nQ18. How do you fix PST or OST corruption? A. Run SCANPST.exe, create a\nnew PST/OST file, reduce mailbox size, and ensure",
+    "source": "email_issues.txt",
+    "start_pos": 3600,
+    "end_pos": 4100
+  },
+  {
+    "id": 9,
+    "text": "new PST/OST file, reduce mailbox size, and ensure proper shutdown and\nbackups.\n \n------------------------------------------------------------------------\n \nQ19. Outlook performance is very slow. What is the reason? A. Large\nmailboxes, too many shared mailboxes, excessive inbox rules, and\nmultiple add-ins can slow down Outlook.\n \nQ20. How can Outlook performance be improved? A. Enable online\narchiving, reduce cached shared mailboxes, clean up inbox rules, and\ndisable unused add-ins.",
+    "source": "email_issues.txt",
+    "start_pos": 4050,
+    "end_pos": 4550
+  },
+  {
+    "id": 10,
+    "text": "Hardware Troubleshooting Guide - IT Help Desk\n\nComputer Won't Turn On\n\nDesktop Computer:\n1. Check power cable is plugged into wall outlet and computer\n2. Try different wall outlet\n3. Check power strip is turned on and working\n4. Look for lights on computer (even when off, some LEDs may glow)\n5. Press and hold power button for 30 seconds to drain power\n6. Unplug computer for 2 minutes, then plug back in\n7. Try turning on again\n8. If no lights or fans spin, contact IT Help Desk\n\nLaptop Computer:\n1",
+    "source": "hardware_issues.txt",
+    "start_pos": 0,
+    "end_pos": 500
+  },
+  {
+    "id": 11,
+    "text": "ans spin, contact IT Help Desk\n\nLaptop Computer:\n1. Plug in AC adapter and verify charging light turns on\n2. Try different wall outlet\n3. Check AC adapter for damage\n4. Remove battery (if removable) and hold power button 30 seconds\n5. Reconnect power and try starting\n6. If battery is dead, leave charging for 30 minutes before starting\n7. If charging light doesn't come on, AC adapter may be faulty\n8. Contact IT Help Desk for replacement adapter\n\nComputer Turns On But No Display\n\nTroubleshooting S",
+    "source": "hardware_issues.txt",
+    "start_pos": 450,
+    "end_pos": 950
+  },
+  {
+    "id": 12,
+    "text": "omputer Turns On But No Display\n\nTroubleshooting Steps:\n1. Check monitor power cable and button\n2. Verify monitor cable connected to computer (VGA/HDMI/DisplayPort)\n3. Check if monitor input source is correct\n4. Try different monitor cable if available\n5. Connect to different monitor to isolate issue\n6. Listen for beeping sounds (indicate hardware error)\n7. If using laptop, try external monitor\n8. Check brightness settings (may be turned all the way down)\n\nFor Multiple Monitors:\n- Press Windows",
+    "source": "hardware_issues.txt",
+    "start_pos": 900,
+    "end_pos": 1400
+  },
+  {
+    "id": 13,
+    "text": "way down)\n\nFor Multiple Monitors:\n- Press Windows + P to check display mode\n- Choose \"Extend\" or \"Duplicate\" as needed\n- Verify both monitors are powered on\n- Check cables for all monitors\n\nComputer Running Slow\n\nQuick Fixes:\n1. Restart your computer (solves 70% of performance issues)\n2. Close unnecessary programs and browser tabs\n3. Check Task Manager (Ctrl+Shift+Esc):\n   - Look for processes using high CPU or Memory\n   - End tasks that aren't needed\n4. Free up disk space (need at least 20GB fr",
+    "source": "hardware_issues.txt",
+    "start_pos": 1350,
+    "end_pos": 1850
+  },
+  {
+    "id": 14,
+    "text": "eeded\n4. Free up disk space (need at least 20GB free):\n   - Delete temporary files\n   - Empty Recycle Bin\n   - Remove unused programs\n   - Move large files to network drive\n\nAdvanced Solutions:\n1. Check for Windows updates: Settings > Update & Security\n2. Run Disk Cleanup: Search > \"Disk Cleanup\"\n3. Disable startup programs: Task Manager > Startup tab\n4. Scan for malware with company antivirus\n5. Defragment hard drive (if not SSD)\n6. Check if computer meets minimum requirements for software\n\nIf",
+    "source": "hardware_issues.txt",
+    "start_pos": 1800,
+    "end_pos": 2300
+  },
+  {
+    "id": 15,
+    "text": "puter meets minimum requirements for software\n\nIf Still Slow:\n- May need RAM upgrade (contact IT Help Desk)\n- Hard drive might be failing (backup data immediately)\n- Submit ticket for IT evaluation\n\nBlue Screen of Death (BSOD)\n\nImmediate Steps:\n1. Take photo of error code/message if possible\n2. Computer will restart automatically\n3. When restarted, check if issue repeats\n4. If repeats immediately, start in Safe Mode:\n   - Restart and press F8 repeatedly\n   - Select \"Safe Mode with Networking\"\n\nC",
+    "source": "hardware_issues.txt",
+    "start_pos": 2250,
+    "end_pos": 2750
+  },
+  {
+    "id": 16,
+    "text": "eatedly\n   - Select \"Safe Mode with Networking\"\n\nCommon BSOD Causes:\n- Faulty RAM\n- Driver conflicts\n- Hardware failure\n- Overheating\n- Windows corruption\n\nReport to IT Help Desk:\n- Error code (e.g., \"STOP 0x0000007B\")\n- What you were doing when it occurred\n- Frequency of blue screens\n- Recent changes (new software, updates)\n\nKeyboard Issues\n\nKeys Not Working:\n1. Check keyboard cable connection\n2. Try different USB port\n3. For wireless keyboard, check batteries\n4. Test keyboard on different comp",
+    "source": "hardware_issues.txt",
+    "start_pos": 2700,
+    "end_pos": 3200
+  },
+  {
+    "id": 17,
+    "text": "check batteries\n4. Test keyboard on different computer\n5. Check if Num Lock/Caps Lock/Scroll Lock is affecting keys\n6. Clean keyboard (compressed air or soft brush)\n7. Try external keyboard to isolate issue\n\nKeyboard Typing Wrong Characters:\n- Verify correct language/keyboard layout selected\n- Windows: Settings > Time & Language > Language\n- Should be \"US\" or your regional setting\n- Check if Filter Keys is enabled (turn off if not needed)\n\nLaptop Keyboard:\n- Use external USB keyboard as temporar",
+    "source": "hardware_issues.txt",
+    "start_pos": 3150,
+    "end_pos": 3650
+  },
+  {
+    "id": 18,
+    "text": "Keyboard:\n- Use external USB keyboard as temporary solution\n- Laptop keyboard replacement requires IT technician\n- Submit ticket for keyboard replacement\n\nMouse Problems\n\nMouse Not Working:\n1. Check USB connection\n2. Try different USB port (preferably at back of desktop)\n3. For wireless mouse:\n   - Check batteries\n   - Verify USB receiver is connected\n   - Press connect button on mouse and receiver\n4. Clean mouse sensor with soft cloth\n5. Try mouse on mouse pad (optical mice need surface contra",
+    "source": "hardware_issues.txt",
+    "start_pos": 3600,
+    "end_pos": 4100
+  },
+  {
+    "id": 19,
+    "text": "use on mouse pad (optical mice need surface contrast)\n6. Test different mouse to rule out hardware issue\n\nMouse Cursor Jumping or Erratic:\n- Clean mouse sensor\n- Use on flat, non-reflective surface\n- Check for driver updates\n- Adjust pointer speed: Settings > Devices > Mouse\n- For laptop trackpad, adjust sensitivity\n- Disable trackpad when using external mouse\n\nAudio Problems\n\nNo Sound:\n1. Check volume level (not muted)\n2. Look for volume icon in system tray (should not have X)\n3. Verify speaker",
+    "source": "hardware_issues.txt",
+    "start_pos": 4050,
+    "end_pos": 4550
+  },
+  {
+    "id": 20,
+    "text": "system tray (should not have X)\n3. Verify speakers/headphones are plugged in correctly\n4. Check speaker power (if external speakers)\n5. Try different audio output device\n6. Right-click volume icon > Open Sound Settings\n7. Select correct output device\n8. Test with headphones to isolate speaker issue\n\nSound Distorted or Crackling:\n- Update audio drivers\n- Check cable connections\n- Reduce volume to see if improves\n- Try different audio file/source\n- Run Windows Troubleshooter: Settings > Update &",
+    "source": "hardware_issues.txt",
+    "start_pos": 4500,
+    "end_pos": 5000
+  },
+  {
+    "id": 21,
+    "text": "- Run Windows Troubleshooter: Settings > Update & Security > Troubleshoot > Playing Audio\n\nMicrophone Not Working:\n1. Check microphone is connected (usually pink port)\n2. Right-click volume > Sounds > Recording tab\n3. Verify microphone is set as default\n4. Speak and check if green bars move (indicating input)\n5. Adjust microphone level if too quiet\n6. For USB microphones, try different USB port\n7. Check app permissions: Settings > Privacy > Microphone\n\nUSB Device Issues\n\nUSB Device Not Recognize",
+    "source": "hardware_issues.txt",
+    "start_pos": 4950,
+    "end_pos": 5450
+  },
+  {
+    "id": 22,
+    "text": "phone\n\nUSB Device Issues\n\nUSB Device Not Recognized:\n1. Unplug device and plug back in\n2. Try different USB port\n3. Restart computer with device unplugged\n4. Reconnect device after Windows loads\n5. Check Device Manager for errors:\n   - Right-click Start > Device Manager\n   - Look for yellow exclamation marks\n   - Update or reinstall drivers\n6. For external hard drives, try with AC adapter\n\nToo Many USB Devices:\n- Computer USB ports may be overloaded\n- Use powered USB hub\n- Available from IT Help",
+    "source": "hardware_issues.txt",
+    "start_pos": 5400,
+    "end_pos": 5900
+  },
+  {
+    "id": 23,
+    "text": "ded\n- Use powered USB hub\n- Available from IT Help Desk\n- Unplug unused devices\n\nExternal Monitor Issues\n\nMonitor No Signal:\n1. Check monitor power\n2. Verify cable connections (both ends)\n3. Try different cable\n4. Press Windows + P and select display mode\n5. Update display drivers\n6. Try monitor on different computer\n\nWrong Resolution:\n- Right-click desktop > Display Settings\n- Scroll to \"Display Resolution\"\n- Select recommended resolution (usually highest)\n- Click \"Keep changes\"\n\nMonitor Flicke",
+    "source": "hardware_issues.txt",
+    "start_pos": 5850,
+    "end_pos": 6350
+  },
+  {
+    "id": 24,
+    "text": "ly highest)\n- Click \"Keep changes\"\n\nMonitor Flickering:\n- Check cable connections\n- Try different cable\n- Update graphics drivers\n- Change refresh rate: Display Settings > Advanced Display Settings\n- Check if monitor is near electromagnetic interference\n\nLaptop Overheating\n\nSigns of Overheating:\n- Laptop very hot to touch\n- Fans running constantly at high speed\n- Computer shuts down unexpectedly\n- Performance degradation\n- Loud fan noise\n\nSolutions:\n1. Ensure vents are not blocked\n2. Use on hard",
+    "source": "hardware_issues.txt",
+    "start_pos": 6300,
+    "end_pos": 6800
+  },
+  {
+    "id": 25,
+    "text": "ns:\n1. Ensure vents are not blocked\n2. Use on hard, flat surface (not bed or couch)\n3. Clean vents with compressed air\n4. Use laptop cooling pad\n5. Close resource-intensive programs\n6. Avoid direct sunlight\n7. Check Task Manager for high CPU usage\n\nIf Continues:\n- Internal dust buildup (needs professional cleaning)\n- Thermal paste may need replacement\n- Fan might be failing\n- Submit ticket for IT evaluation\n\nBattery Issues\n\nLaptop Battery Won't Charge:\n1. Check AC adapter light is on\n2. Verify c",
+    "source": "hardware_issues.txt",
+    "start_pos": 6750,
+    "end_pos": 7250
+  },
+  {
+    "id": 26,
+    "text": "harge:\n1. Check AC adapter light is on\n2. Verify charging port is clean and undamaged\n3. Try different wall outlet\n4. Check battery health:\n   - Run \"powercfg /batteryreport\" in Command Prompt\n   - Report saved to C:\\Windows\\system32\\battery-report.html\n5. Unplug AC adapter, remove battery, hold power 30 seconds\n6. Reinstall battery and try charging\n\nBattery Drains Quickly:\n- Adjust power settings: Settings > System > Power & Battery\n- Select \"Better battery\" or \"Best battery life\"\n- Lower scree",
+    "source": "hardware_issues.txt",
+    "start_pos": 7200,
+    "end_pos": 7700
+  },
+  {
+    "id": 27,
+    "text": "tter battery\" or \"Best battery life\"\n- Lower screen brightness\n- Close unused applications\n- Disable Bluetooth and WiFi when not needed\n- Update Windows and drivers\n\nBattery Health:\n- Lithium batteries degrade over time (typical life: 2-3 years)\n- Keep battery between 20-80% charge when possible\n- Avoid complete discharges\n- Don't leave laptop plugged in 24/7\n- Request battery replacement if health below 50%\n\nHardware Requests\n\nEquipment You Can Request:\n- Monitor (single or dual setup)\n- Keyboa",
+    "source": "hardware_issues.txt",
+    "start_pos": 7650,
+    "end_pos": 8150
+  },
+  {
+    "id": 28,
+    "text": "Request:\n- Monitor (single or dual setup)\n- Keyboard and mouse\n- Headset with microphone\n- Laptop dock/docking station\n- USB hub\n- Monitor cables and adapters\n- Laptop bag\n- Ergonomic equipment (keyboard, mouse, standing desk)\n\nHow to Request:\n1. Submit ticket: https://helpdesk.company.com\n2. Select \"Hardware Request\"\n3. Specify equipment needed\n4. Provide justification if required\n5. Include cost center/budget code\n6. Manager approval may be required for some items\n\nTypical Approval Time: 3-5 b",
+    "source": "hardware_issues.txt",
+    "start_pos": 8100,
+    "end_pos": 8600
+  },
+  {
+    "id": 29,
+    "text": "uired for some items\n\nTypical Approval Time: 3-5 business days\nDelivery: 1-2 weeks depending on availability\n\nReporting Hardware Problems\n\nWhen to Contact IT Help Desk:\n- Computer won't turn on\n- Repeated blue screens or crashes\n- Suspected hardware failure\n- Physical damage to equipment\n- Liquid spill on device\n- Unusual noises (clicking, grinding)\n- Burning smell (unplug immediately and call IT)\n\nWhat to Include in Ticket:\n- Detailed description of problem\n- Error messages or codes\n- When prob",
+    "source": "hardware_issues.txt",
+    "start_pos": 8550,
+    "end_pos": 9050
+  },
+  {
+    "id": 30,
+    "text": "n of problem\n- Error messages or codes\n- When problem started\n- What you were doing when it occurred\n- Steps you've already tried\n- Computer asset tag number (sticker on device)\n- Your location and contact info\n\nEmergency Hardware Issues:\n- For urgent issues affecting critical work\n- Call IT Help Desk directly: (555) 123-4567\n- After hours emergency: (555) 123-4599\n- Loaner equipment available while yours is repaired\n\nPreventive Maintenance\n\nKeep Your Computer Healthy:\n1. Restart at least once a",
+    "source": "hardware_issues.txt",
+    "start_pos": 9000,
+    "end_pos": 9500
+  },
+  {
+    "id": 31,
+    "text": "Your Computer Healthy:\n1. Restart at least once a week\n2. Install Windows updates promptly\n3. Keep antivirus updated\n4. Don't eat/drink near computer\n5. Keep computer in clean, dust-free area\n6. Maintain good airflow around device\n7. Use surge protector\n8. Backup important files regularly\n9. Report issues early (don't wait for complete failure)\n10. Bring laptop to IT for annual checkup\n\nExtended Life Tips:\n- Handle laptop by base, not screen\n- Don't put heavy items on closed laptop\n- Store in p",
+    "source": "hardware_issues.txt",
+    "start_pos": 9450,
+    "end_pos": 9950
+  },
+  {
+    "id": 32,
+    "text": "on't put heavy items on closed laptop\n- Store in protective case when transporting\n- Coil cables loosely (not tightly)\n- Clean keyboard and screen monthly\n- Keep software updated\n\n\nIssues:\n-Laptop key's issues\n-Laptop not getting on \n-Laptop Mother borad issue \n-Laptop Fan issue \n-Display Issue broken issue \n-CPU issues \n-Laptop RAM issue\n\nResponse - \nIf you are usig HP laptop - \n 1.Go to the link - https://mycrm.support.hp.com/en-US/edit-case?cid=30f7e906-0efc-f011-8406-7ced8d6e5e0c\n 2.Contact",
+    "source": "hardware_issues.txt",
+    "start_pos": 9900,
+    "end_pos": 10400
+  },
+  {
+    "id": 33,
+    "text": "d=30f7e906-0efc-f011-8406-7ced8d6e5e0c\n 2.Contact HP toll free number - 1800 258 7170\n 3.Reach IT support if laptops not under warranty.\n\nIf you are using Lenovo Laptop,\n 1.Go to the link - https://support.lenovo.com/in/en/solutions/ht102247-submit-a-service-request\n 2.Contact Lenovo customer care 1800 419 9339\n 3.Reach IT support if laptops not under warranty.",
+    "source": "hardware_issues.txt",
+    "start_pos": 10350,
+    "end_pos": 10850
+  },
+  {
+    "id": 34,
+    "text": "Password Reset Guide - IT Help Desk\n\nHow to Reset Your Password\n\nIf you've forgotten your password or need to reset it for security reasons, follow these steps:\n\nMethod 1: Self-Service Password Reset\n1. Go to the company portal at https://passwordreset.microsoftonline.com/\n2. Enter your username or email address\n3. Enter the Captcha accordingly.\n4. Click on Next.You can chooose verificiation models from the given options.\n   1.Alternate Mail ID\n   2.Text mobile number by otp.\n   3.Call to mobile",
+    "source": "password_reset.txt",
+    "start_pos": 0,
+    "end_pos": 500
+  },
+  {
+    "id": 35,
+    "text": "2.Text mobile number by otp.\n   3.Call to mobile number.\n5. Choose alternate email id \n6. Enter verificiation code from the alternate email.\n7. Now you can create a new password.\n8. Your new password must meet these requirements:\n   - At least 12 characters long\n   - Contains uppercase and lowercase letters\n   - Contains at least one number\n   - Contains at least one special character (!@#$%^&*)\n   - Cannot be any of your last 5 passwords\n9. Click \"Reset Password\" to complete the process\n\nMeth",
+    "source": "password_reset.txt",
+    "start_pos": 450,
+    "end_pos": 950
+  },
+  {
+    "id": 36,
+    "text": "ick \"Reset Password\" to complete the process\n\nMethod 2: Contact IT Help Desk\nIf self-service doesn't work, contact IT Help Desk:\n- Email: subrahmanyam.pillalamarri@cognida.ai,aditya.kovoor@cognida.ai\n- Chat: Available on company portal\n- In Person: Visit IT Help Desk Subrahmanyam Pillalamarri, Aditya Kovoor",
+    "source": "password_reset.txt",
+    "start_pos": 900,
+    "end_pos": 1400
+  },
+  {
+    "id": 37,
+    "text": "VPN Access Guide - IT Help Desk\n\nVirtual Private Network (VPN) Setup and Troubleshooting\n\nWhat is VPN?\nA VPN (Virtual Private Network) allows you to securely connect to the company network from remote locations. This is required when working from home or traveling.\n\nSystem Requirements\n- Windows 10/11, macOS 10.15+, or Linux Ubuntu 20.04+\n- Stable internet connection (minimum 5 Mbps)\n- Cisco AnyConnect VPN Client installed\n\nInstalling VPN Client\n\nWindows:\n1. Download Cisco AnyConnect from https:",
+    "source": "vpn_access.txt",
+    "start_pos": 0,
+    "end_pos": 500
+  },
+  {
+    "id": 38,
+    "text": "Windows:\n1. Download Cisco AnyConnect from https://vpn.company.com\n2. Run the installer as Administrator\n3. Follow the installation wizard\n4. Restart your computer when prompted\n\nMac:\n1. Download Cisco AnyConnect for Mac\n2. Open the .dmg file\n3. Drag the application to Applications folder\n4. Allow system extension when prompted in Security & Privacy settings\n5. Restart your Mac\n\nConnecting to VPN\n1. Open Cisco AnyConnect application\n2. Enter VPN address: vpn.company.com\n3. Click \"Connect\"\n4. En",
+    "source": "vpn_access.txt",
+    "start_pos": 450,
+    "end_pos": 950
+  },
+  {
+    "id": 39,
+    "text": "address: vpn.company.com\n3. Click \"Connect\"\n4. Enter your credentials:\n   - Username: Your network username\n   - Password: Your network password\n5. Enter the code from your MFA token when prompted\n6. Wait for \"Connected\" status (green checkmark)\n\nMulti-Factor Authentication (MFA)\nVPN requires MFA for security. You must have one of:\n- Microsoft Authenticator app\n- Duo Mobile app\n- Hardware token (available from IT Help Desk)\n\nCommon VPN Issues and Solutions\n\nIssue 1: \"Connection Failed\" Error\nSo",
+    "source": "vpn_access.txt",
+    "start_pos": 900,
+    "end_pos": 1400
+  },
+  {
+    "id": 40,
+    "text": "d Solutions\n\nIssue 1: \"Connection Failed\" Error\nSolution:\n- Check your internet connection\n- Verify you're using correct VPN address: vpn.company.com\n- Temporarily disable firewall/antivirus\n- Try connecting to a different WiFi network\n\nIssue 2: \"Authentication Failed\"\nSolution:\n- Verify username and password are correct\n- Check if your account is locked\n- Ensure MFA token is current (tokens expire after 30 seconds)\n- Reset your password if needed\n\nIssue 3: Slow VPN Connection\nSolution:\n- Close",
+    "source": "vpn_access.txt",
+    "start_pos": 1350,
+    "end_pos": 1850
+  },
+  {
+    "id": 41,
+    "text": "d\n\nIssue 3: Slow VPN Connection\nSolution:\n- Close unnecessary applications\n- Check your internet speed (run speed test)\n- Try connecting at off-peak hours\n- Contact IT if speed is consistently under 1 Mbps\n\nIssue 4: VPN Disconnects Frequently\nSolution:\n- Update Cisco AnyConnect to latest version\n- Check power settings (disable sleep mode)\n- Ensure stable internet connection\n- Contact your ISP if connection drops frequently\n\nIssue 5: Cannot Access Internal Resources\nSolution:\n- Verify VPN is conn",
+    "source": "vpn_access.txt",
+    "start_pos": 1800,
+    "end_pos": 2300
+  },
+  {
+    "id": 42,
+    "text": "Internal Resources\nSolution:\n- Verify VPN is connected (green checkmark)\n- Check if split tunneling is enabled\n- Try disconnecting and reconnecting\n- Contact IT Help Desk to verify your access permissions\n\nSplit Tunneling\nSplit tunneling allows some traffic to bypass VPN:\n- Company resources go through VPN\n- Personal browsing goes direct\nThis improves performance while maintaining security.\n\nVPN Best Practices\n- Always connect to VPN when accessing company resources remotely\n- Disconnect VPN wh",
+    "source": "vpn_access.txt",
+    "start_pos": 2250,
+    "end_pos": 2750
+  },
+  {
+    "id": 43,
+    "text": "ing company resources remotely\n- Disconnect VPN when not in use to save bandwidth\n- Never share your VPN credentials\n- Use secure WiFi networks (avoid public WiFi if possible)\n- Keep VPN client updated\n- Report any suspicious activity immediately\n\nGetting Help\nIf you continue experiencing issues:\n- Email: vpn-support@company.com\n- Phone: (555) 123-4567, Option 2\n- Submit ticket: https://helpdesk.company.com\n- Emergency after-hours: (555) 123-4599",
+    "source": "vpn_access.txt",
+    "start_pos": 2700,
+    "end_pos": 3200
+  }
+]

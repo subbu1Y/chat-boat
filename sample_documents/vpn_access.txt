@@ -1,0 +1,101 @@
+VPN Access Guide - IT Help Desk
+
+Virtual Private Network (VPN) Setup and Troubleshooting
+
+What is VPN?
+A VPN (Virtual Private Network) allows you to securely connect to the company network from remote locations. This is required when working from home or traveling.
+
+System Requirements
+- Windows 10/11, macOS 10.15+, or Linux Ubuntu 20.04+
+- Stable internet connection (minimum 5 Mbps)
+- Cisco AnyConnect VPN Client installed
+
+Installing VPN Client
+
+Windows:
+1. Download Cisco AnyConnect from https://vpn.company.com
+2. Run the installer as Administrator
+3. Follow the installation wizard
+4. Restart your computer when prompted
+
+Mac:
+1. Download Cisco AnyConnect for Mac
+2. Open the .dmg file
+3. Drag the application to Applications folder
+4. Allow system extension when prompted in Security & Privacy settings
+5. Restart your Mac
+
+Connecting to VPN
+1. Open Cisco AnyConnect application
+2. Enter VPN address: vpn.company.com
+3. Click "Connect"
+4. Enter your credentials:
+   - Username: Your network username
+   - Password: Your network password
+5. Enter the code from your MFA token when prompted
+6. Wait for "Connected" status (green checkmark)
+
+Multi-Factor Authentication (MFA)
+VPN requires MFA for security. You must have one of:
+- Microsoft Authenticator app
+- Duo Mobile app
+- Hardware token (available from IT Help Desk)
+
+Common VPN Issues and Solutions
+
+Issue 1: "Connection Failed" Error
+Solution:
+- Check your internet connection
+- Verify you're using correct VPN address: vpn.company.com
+- Temporarily disable firewall/antivirus
+- Try connecting to a different WiFi network
+
+Issue 2: "Authentication Failed"
+Solution:
+- Verify username and password are correct
+- Check if your account is locked
+- Ensure MFA token is current (tokens expire after 30 seconds)
+- Reset your password if needed
+
+Issue 3: Slow VPN Connection
+Solution:
+- Close unnecessary applications
+- Check your internet speed (run speed test)
+- Try connecting at off-peak hours
+- Contact IT if speed is consistently under 1 Mbps
+
+Issue 4: VPN Disconnects Frequently
+Solution:
+- Update Cisco AnyConnect to latest version
+- Check power settings (disable sleep mode)
+- Ensure stable internet connection
+- Contact your ISP if connection drops frequently
+
+Issue 5: Cannot Access Internal Resources
+Solution:
+- Verify VPN is connected (green checkmark)
+- Check if split tunneling is enabled
+- Try disconnecting and reconnecting
+- Contact IT Help Desk to verify your access permissions
+
+Split Tunneling
+Split tunneling allows some traffic to bypass VPN:
+- Company resources go through VPN
+- Personal browsing goes direct
+This improves performance while maintaining security.
+
+VPN Best Practices
+- Always connect to VPN when accessing company resources remotely
+- Disconnect VPN when not in use to save bandwidth
+- Never share your VPN credentials
+- Use secure WiFi networks (avoid public WiFi if possible)
+- Keep VPN client updated
+- Report any suspicious activity immediately
+
+Getting Help
+If you continue experiencing issues:
+- Email: vpn-support@company.com
+- Phone: (555) 123-4567, Option 2
+- Submit ticket: https://helpdesk.company.com
+- Emergency after-hours: (555) 123-4599
+

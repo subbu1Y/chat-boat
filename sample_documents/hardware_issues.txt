@@ -1,0 +1,347 @@
+Hardware Troubleshooting Guide - IT Help Desk
+
+Computer Won't Turn On
+
+Desktop Computer:
+1. Check power cable is plugged into wall outlet and computer
+2. Try different wall outlet
+3. Check power strip is turned on and working
+4. Look for lights on computer (even when off, some LEDs may glow)
+5. Press and hold power button for 30 seconds to drain power
+6. Unplug computer for 2 minutes, then plug back in
+7. Try turning on again
+8. If no lights or fans spin, contact IT Help Desk
+
+Laptop Computer:
+1. Plug in AC adapter and verify charging light turns on
+2. Try different wall outlet
+3. Check AC adapter for damage
+4. Remove battery (if removable) and hold power button 30 seconds
+5. Reconnect power and try starting
+6. If battery is dead, leave charging for 30 minutes before starting
+7. If charging light doesn't come on, AC adapter may be faulty
+8. Contact IT Help Desk for replacement adapter
+
+Computer Turns On But No Display
+
+Troubleshooting Steps:
+1. Check monitor power cable and button
+2. Verify monitor cable connected to computer (VGA/HDMI/DisplayPort)
+3. Check if monitor input source is correct
+4. Try different monitor cable if available
+5. Connect to different monitor to isolate issue
+6. Listen for beeping sounds (indicate hardware error)
+7. If using laptop, try external monitor
+8. Check brightness settings (may be turned all the way down)
+
+For Multiple Monitors:
+- Press Windows + P to check display mode
+- Choose "Extend" or "Duplicate" as needed
+- Verify both monitors are powered on
+- Check cables for all monitors
+
+Computer Running Slow
+
+Quick Fixes:
+1. Restart your computer (solves 70% of performance issues)
+2. Close unnecessary programs and browser tabs
+3. Check Task Manager (Ctrl+Shift+Esc):
+   - Look for processes using high CPU or Memory
+   - End tasks that aren't needed
+4. Free up disk space (need at least 20GB free):
+   - Delete temporary files
+   - Empty Recycle Bin
+   - Remove unused programs
+   - Move large files to network drive
+
+Advanced Solutions:
+1. Check for Windows updates: Settings > Update & Security
+2. Run Disk Cleanup: Search > "Disk Cleanup"
+3. Disable startup programs: Task Manager > Startup tab
+4. Scan for malware with company antivirus
+5. Defragment hard drive (if not SSD)
+6. Check if computer meets minimum requirements for software
+
+If Still Slow:
+- May need RAM upgrade (contact IT Help Desk)
+- Hard drive might be failing (backup data immediately)
+- Submit ticket for IT evaluation
+
+Blue Screen of Death (BSOD)
+
+Immediate Steps:
+1. Take photo of error code/message if possible
+2. Computer will restart automatically
+3. When restarted, check if issue repeats
+4. If repeats immediately, start in Safe Mode:
+   - Restart and press F8 repeatedly
+   - Select "Safe Mode with Networking"
+
+Common BSOD Causes:
+- Faulty RAM
+- Driver conflicts
+- Hardware failure
+- Overheating
+- Windows corruption
+
+Report to IT Help Desk:
+- Error code (e.g., "STOP 0x0000007B")
+- What you were doing when it occurred
+- Frequency of blue screens
+- Recent changes (new software, updates)
+
+Keyboard Issues
+
+Keys Not Working:
+1. Check keyboard cable connection
+2. Try different USB port
+3. For wireless keyboard, check batteries
+4. Test keyboard on different computer
+5. Check if Num Lock/Caps Lock/Scroll Lock is affecting keys
+6. Clean keyboard (compressed air or soft brush)
+7. Try external keyboard to isolate issue
+
+Keyboard Typing Wrong Characters:
+- Verify correct language/keyboard layout selected
+- Windows: Settings > Time & Language > Language
+- Should be "US" or your regional setting
+- Check if Filter Keys is enabled (turn off if not needed)
+
+Laptop Keyboard:
+- Use external USB keyboard as temporary solution
+- Laptop keyboard replacement requires IT technician
+- Submit ticket for keyboard replacement
+
+Mouse Problems
+
+Mouse Not Working:
+1. Check USB connection
+2. Try different USB port (preferably at back of desktop)
+3. For wireless mouse:
+   - Check batteries
+   - Verify USB receiver is connected
+   - Press connect button on mouse and receiver
+4. Clean mouse sensor with soft cloth
+5. Try mouse on mouse pad (optical mice need surface contrast)
+6. Test different mouse to rule out hardware issue
+
+Mouse Cursor Jumping or Erratic:
+- Clean mouse sensor
+- Use on flat, non-reflective surface
+- Check for driver updates
+- Adjust pointer speed: Settings > Devices > Mouse
+- For laptop trackpad, adjust sensitivity
+- Disable trackpad when using external mouse
+
+Audio Problems
+
+No Sound:
+1. Check volume level (not muted)
+2. Look for volume icon in system tray (should not have X)
+3. Verify speakers/headphones are plugged in correctly
+4. Check speaker power (if external speakers)
+5. Try different audio output device
+6. Right-click volume icon > Open Sound Settings
+7. Select correct output device
+8. Test with headphones to isolate speaker issue
+
+Sound Distorted or Crackling:
+- Update audio drivers
+- Check cable connections
+- Reduce volume to see if improves
+- Try different audio file/source
+- Run Windows Troubleshooter: Settings > Update & Security > Troubleshoot > Playing Audio
+
+Microphone Not Working:
+1. Check microphone is connected (usually pink port)
+2. Right-click volume > Sounds > Recording tab
+3. Verify microphone is set as default
+4. Speak and check if green bars move (indicating input)
+5. Adjust microphone level if too quiet
+6. For USB microphones, try different USB port
+7. Check app permissions: Settings > Privacy > Microphone
+
+USB Device Issues
+
+USB Device Not Recognized:
+1. Unplug device and plug back in
+2. Try different USB port
+3. Restart computer with device unplugged
+4. Reconnect device after Windows loads
+5. Check Device Manager for errors:
+   - Right-click Start > Device Manager
+   - Look for yellow exclamation marks
+   - Update or reinstall drivers
+6. For external hard drives, try with AC adapter
+
+Too Many USB Devices:
+- Computer USB ports may be overloaded
+- Use powered USB hub
+- Available from IT Help Desk
+- Unplug unused devices
+
+External Monitor Issues
+
+Monitor No Signal:
+1. Check monitor power
+2. Verify cable connections (both ends)
+3. Try different cable
+4. Press Windows + P and select display mode
+5. Update display drivers
+6. Try monitor on different computer
+
+Wrong Resolution:
+- Right-click desktop > Display Settings
+- Scroll to "Display Resolution"
+- Select recommended resolution (usually highest)
+- Click "Keep changes"
+
+Monitor Flickering:
+- Check cable connections
+- Try different cable
+- Update graphics drivers
+- Change refresh rate: Display Settings > Advanced Display Settings
+- Check if monitor is near electromagnetic interference
+
+Laptop Overheating
+
+Signs of Overheating:
+- Laptop very hot to touch
+- Fans running constantly at high speed
+- Computer shuts down unexpectedly
+- Performance degradation
+- Loud fan noise
+
+Solutions:
+1. Ensure vents are not blocked
+2. Use on hard, flat surface (not bed or couch)
+3. Clean vents with compressed air
+4. Use laptop cooling pad
+5. Close resource-intensive programs
+6. Avoid direct sunlight
+7. Check Task Manager for high CPU usage
+
+If Continues:
+- Internal dust buildup (needs professional cleaning)
+- Thermal paste may need replacement
+- Fan might be failing
+- Submit ticket for IT evaluation
+
+Battery Issues
+
+Laptop Battery Won't Charge:
+1. Check AC adapter light is on
+2. Verify charging port is clean and undamaged
+3. Try different wall outlet
+4. Check battery health:
+   - Run "powercfg /batteryreport" in Command Prompt
+   - Report saved to C:\Windows\system32\battery-report.html
+5. Unplug AC adapter, remove battery, hold power 30 seconds
+6. Reinstall battery and try charging
+
+Battery Drains Quickly:
+- Adjust power settings: Settings > System > Power & Battery
+- Select "Better battery" or "Best battery life"
+- Lower screen brightness
+- Close unused applications
+- Disable Bluetooth and WiFi when not needed
+- Update Windows and drivers
+
+Battery Health:
+- Lithium batteries degrade over time (typical life: 2-3 years)
+- Keep battery between 20-80% charge when possible
+- Avoid complete discharges
+- Don't leave laptop plugged in 24/7
+- Request battery replacement if health below 50%
+
+Hardware Requests
+
+Equipment You Can Request:
+- Monitor (single or dual setup)
+- Keyboard and mouse
+- Headset with microphone
+- Laptop dock/docking station
+- USB hub
+- Monitor cables and adapters
+- Laptop bag
+- Ergonomic equipment (keyboard, mouse, standing desk)
+
+How to Request:
+1. Submit ticket: https://helpdesk.company.com
+2. Select "Hardware Request"
+3. Specify equipment needed
+4. Provide justification if required
+5. Include cost center/budget code
+6. Manager approval may be required for some items
+
+Typical Approval Time: 3-5 business days
+Delivery: 1-2 weeks depending on availability
+
+Reporting Hardware Problems
+
+When to Contact IT Help Desk:
+- Computer won't turn on
+- Repeated blue screens or crashes
+- Suspected hardware failure
+- Physical damage to equipment
+- Liquid spill on device
+- Unusual noises (clicking, grinding)
+- Burning smell (unplug immediately and call IT)
+
+What to Include in Ticket:
+- Detailed description of problem
+- Error messages or codes
+- When problem started
+- What you were doing when it occurred
+- Steps you've already tried
+- Computer asset tag number (sticker on device)
+- Your location and contact info
+
+Emergency Hardware Issues:
+- For urgent issues affecting critical work
+- Call IT Help Desk directly: (555) 123-4567
+- After hours emergency: (555) 123-4599
+- Loaner equipment available while yours is repaired
+
+Preventive Maintenance
+
+Keep Your Computer Healthy:
+1. Restart at least once a week
+2. Install Windows updates promptly
+3. Keep antivirus updated
+4. Don't eat/drink near computer
+5. Keep computer in clean, dust-free area
+6. Maintain good airflow around device
+7. Use surge protector
+8. Backup important files regularly
+9. Report issues early (don't wait for complete failure)
+10. Bring laptop to IT for annual checkup
+
+Extended Life Tips:
+- Handle laptop by base, not screen
+- Don't put heavy items on closed laptop
+- Store in protective case when transporting
+- Coil cables loosely (not tightly)
+- Clean keyboard and screen monthly
+- Keep software updated
+
+
+Issues:
+-Laptop key's issues
+-Laptop not getting on 
+-Laptop Mother borad issue 
+-Laptop Fan issue 
+-Display Issue broken issue 
+-CPU issues 
+-Laptop RAM issue
+
+Response - 
+If you are usig HP laptop - 
+ 1.Go to the link - https://mycrm.support.hp.com/en-US/edit-case?cid=30f7e906-0efc-f011-8406-7ced8d6e5e0c
+ 2.Contact HP toll free number - 1800 258 7170
+ 3.Reach IT support if laptops not under warranty.
+
+If you are using Lenovo Laptop,
+ 1.Go to the link - https://support.lenovo.com/in/en/solutions/ht102247-submit-a-service-request
+ 2.Contact Lenovo customer care 1800 419 9339
+ 3.Reach IT support if laptops not under warranty.

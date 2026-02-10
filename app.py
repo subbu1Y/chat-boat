@@ -75,6 +75,19 @@ st.markdown("""
     .email-it-link { font-size: 0.9em; margin-top: 6px; }
     .email-it-link a { color: #3949ab; text-decoration: none; }
     .email-it-link a:hover { text-decoration: underline; }
+    /* Typing indicator */
+    .typing-indicator {
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 14px;
+        background-color: #f3e5f5;
+        border-left: 5px solid #9c27b0;
+        display: inline-block;
+    }
+    .typing-dots span { animation: typing-blink 1.4s infinite; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing-blink { 0%, 60% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 """, unsafe_allow_html=True)
 
@@ -91,6 +104,8 @@ def initialize_session_state():
         st.session_state.chat_history = []
     if 'messages' not in st.session_state:
         st.session_state.messages = []
+    if 'pending_query' not in st.session_state:
+        st.session_state.pending_query = None
 
 
 def display_chat_message(role: str, content: str, sources: list = None):
@@ -102,6 +117,16 @@ def display_chat_message(role: str, content: str, sources: list = None):
         <div class="chat-message {css_class}">
             <strong>{icon} {role.capitalize()}:</strong><br>
             {content}
+        </div>
+    """, unsafe_allow_html=True)
+
+
+def display_typing_indicator():
+    """Show assistant typing indicator (animated dots)."""
+    st.markdown("""
+        <div class="typing-indicator">
+            <strong>🤖 Assistant:</strong>
+            <span class="typing-dots"> <span>.</span><span>.</span><span>.</span></span>
         </div>
     """, unsafe_allow_html=True)
 
@@ -124,10 +149,21 @@ def main():
     # Initialize session state
     initialize_session_state()
 
-    # ---------- LEFT SIDEBAR: Conversation view (what you've asked the chatbot) ----------
+    # ---------- LEFT SIDEBAR: New chat + Conversation view ----------
     with st.sidebar:
+        if st.button("✨ New chat", use_container_width=True, type="primary"):
+            st.session_state.messages = []
+            st.session_state.chat_history = []
+            st.session_state.pending_query = None
+            st.rerun()
+        st.divider()
         st.markdown("### 📋 Conversation view")
         st.markdown("*Your questions to the chatbot*")
+        if st.button("🗑️ Clear conversation", use_container_width=True):
+            st.session_state.messages = []
+            st.session_state.chat_history = []
+            st.session_state.pending_query = None
+            st.rerun()
         st.divider()
         user_messages = [m["content"] for m in st.session_state.messages if m["role"] == "user"]
         if not user_messages:
@@ -169,27 +205,14 @@ def main():
                 unsafe_allow_html=True
             )
 
-    # Chat input
-    user_input = st.chat_input("Type your IT help desk question here...")
-
-    if user_input:
-        # Store user message
-        st.session_state.messages.append({
-            'role': 'user',
-            'content': user_input
-        })
-        st.session_state.chat_history.append({
-            'role': 'user',
-            'content': user_input
-        })
-
-        display_chat_message('user', user_input)
-
-        # Query RAG backend
-        with st.spinner("🔍 Searching knowledge base and generating response..."):
-            result = rag_backend.query(user_input, st.session_state.chat_history)
-
-        # Store assistant message
+    # If we have a pending query, show typing indicator and fetch response
+    if st.session_state.pending_query is not None:
+        display_typing_indicator()
+        with st.spinner("Searching knowledge base and generating response..."):
+            result = rag_backend.query(
+                st.session_state.pending_query,
+                st.session_state.chat_history
+            )
         st.session_state.messages.append({
             'role': 'assistant',
             'content': result['response'],
@@ -199,9 +222,22 @@ def main():
             'role': 'assistant',
             'content': result['response']
         })
+        st.session_state.pending_query = None
+        st.rerun()
 
-        display_chat_message('assistant', result['response'], result['sources'])
+    user_input = st.chat_input("Type your IT help desk question here...")
 
+    if user_input:
+        # Store user message and set pending query (show typing on next run)
+        st.session_state.messages.append({
+            'role': 'user',
+            'content': user_input
+        })
+        st.session_state.chat_history.append({
+            'role': 'user',
+            'content': user_input
+        })
+        st.session_state.pending_query = user_input
         st.rerun()
 
     # Welcome screen

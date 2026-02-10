@@ -160,12 +160,15 @@ class RAGBackend:
         return "\n\n---\n\n".join(context_parts)
     
     def create_prompt(self, query: str, context: str, chat_history: List[Dict] = None) -> str:
-        """Create prompt for Grok LLM"""
-        system_prompt = """You are a helpful IT Help Desk assistant. Your job is to help users with their IT-related questions and issues.
+        """Create prompt for LLM with clear instructions for better responses"""
+        system_prompt = """You are an expert IT Help Desk assistant. Your job is to help users with IT-related questions and issues.
 
-Use the following context from the knowledge base to answer the user's question. If the context doesn't contain relevant information, acknowledge this and provide general IT help desk guidance if appropriate.
-
-Always be professional, clear, and concise. If you're unsure about something, say so rather than making up information."""
+Instructions for your response:
+1. Use the KNOWLEDGE BASE CONTEXT below as the primary source. Base your answer on it when it is relevant.
+2. Structure your answer clearly: use short paragraphs, bullet points or numbered steps when explaining procedures.
+3. Be specific and actionable (e.g. exact steps, links, or options) instead of vague advice.
+4. If the context does not contain enough information, say so briefly and give the best general guidance you can.
+5. Stay professional, clear, and concise. Do not make up information; if unsure, say so."""
 
         context_section = f"\n\nKNOWLEDGE BASE CONTEXT:\n{context}\n"
         
@@ -177,7 +180,7 @@ Always be professional, clear, and concise. If you're unsure about something, sa
                 content = msg.get('content', '')
                 history_section += f"{role.upper()}: {content}\n"
         
-        user_query = f"\n\nUSER QUESTION:\n{query}\n\nPlease provide a helpful response based on the context above."
+        user_query = f"\n\nUSER QUESTION:\n{query}\n\nProvide a helpful, well-structured response based on the context above."
         
         return system_prompt + context_section + history_section + user_query
     
@@ -209,10 +212,15 @@ Always be professional, clear, and concise. If you're unsure about something, sa
             }
         
         try:
+            system_instruction = (
+                "You are an expert IT Help Desk assistant. Give clear, structured answers. "
+                "Use bullet points or numbered steps when explaining procedures. "
+                "Base answers on the provided context; if context is missing, say so and give brief general guidance."
+            )
             response = self.client.chat.completions.create(
                 model=self.model_name,
                 messages=[
-                    {"role": "system", "content": "You are a helpful IT Help Desk assistant."},
+                    {"role": "system", "content": system_instruction},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=config.TEMPERATURE,
@@ -220,7 +228,11 @@ Always be professional, clear, and concise. If you're unsure about something, sa
             )
             
             answer = response.choices[0].message.content
-            
+
+            # Footer line at the end of every assistant response
+            footer = "\n\n---\nIf the issue is not resolved or it is an access-based issue, please reach out or send an email to Cognida_IT@cognida.ai"
+            answer = answer.strip() + footer
+
             # Extract unique sources
             sources = list(set([chunk['source'] for chunk, _ in relevant_chunks]))
             

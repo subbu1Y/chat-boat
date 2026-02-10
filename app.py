@@ -2,9 +2,21 @@
 IT Help Desk Chatbot - Streamlit Frontend
 RAG-based chatbot using Grok LLM
 """
+import urllib.parse
 import streamlit as st
 from rag_backend import RAGBackend
 import config
+
+
+def build_email_to_it_link(user_question: str, response_preview: str = "") -> str:
+    """Build mailto link for emailing the issue to IT."""
+    to = "Cognida_IT@cognida.ai"
+    subject = "IT Help Desk - Issue from Chatbot"
+    body = f"I raised the following issue with the IT Help Desk Chatbot:\n\n{user_question}"
+    if response_preview:
+        body += f"\n\nChatbot response (summary):\n{response_preview}"
+    body += "\n\nThe above issue is not resolved / I need further assistance."
+    return f"mailto:{to}?subject={urllib.parse.quote(subject)}&body={urllib.parse.quote(body)}"
 
 
 # Page configuration
@@ -30,12 +42,13 @@ st.markdown("""
     .main-header {
         position: relative;
         text-align: center;
-        padding: 20px;
+        padding: 28px 24px;
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
         color: white;
         border-radius: 10px;
         margin-bottom: 30px;
     }
+    .main-header h1 { font-size: 2rem; margin: 0; }
     .header-tagline {
         position: absolute;
         bottom: 10px;
@@ -59,6 +72,9 @@ st.markdown("""
     }
     /* Logo column - no white background, transparent so app background shows */
     [data-testid="column"]:first-child .stImage img { background: transparent !important; }
+    .email-it-link { font-size: 0.9em; margin-top: 6px; }
+    .email-it-link a { color: #3949ab; text-decoration: none; }
+    .email-it-link a:hover { text-decoration: underline; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -108,6 +124,20 @@ def main():
     # Initialize session state
     initialize_session_state()
 
+    # ---------- LEFT SIDEBAR: Conversation view (what you've asked the chatbot) ----------
+    with st.sidebar:
+        st.markdown("### 📋 Conversation view")
+        st.markdown("*Your questions to the chatbot*")
+        st.divider()
+        user_messages = [m["content"] for m in st.session_state.messages if m["role"] == "user"]
+        if not user_messages:
+            st.caption("No messages yet. Start by typing a question below.")
+        else:
+            for i, msg in enumerate(user_messages, 1):
+                preview = (msg[:60] + "…") if len(msg) > 60 else msg
+                st.markdown(f"**{i}.** {preview}")
+                st.caption("")
+
     # Main layout
     col1, col2 = st.columns([3, 1])
 
@@ -122,13 +152,22 @@ def main():
         st.info("Please make sure you've run `indexer.py` to create the knowledge base first.")
         st.stop()
 
-    # Display chat history
-    for message in st.session_state.messages:
+    # Display chat history (with "Email this issue to IT" after each assistant reply)
+    for i, message in enumerate(st.session_state.messages):
         display_chat_message(
             message['role'],
             message['content'],
             message.get('sources', [])
         )
+        # After each assistant message, show link to email this issue to IT
+        if message['role'] == 'assistant' and i > 0:
+            user_question = st.session_state.messages[i - 1]['content']
+            response_preview = (message['content'][:300] + "...") if len(message['content']) > 300 else message['content']
+            mailto_url = build_email_to_it_link(user_question, response_preview)
+            st.markdown(
+                f'<p class="email-it-link">📧 <a href="{mailto_url}">Email this issue to IT (Cognida_IT@cognida.ai)</a></p>',
+                unsafe_allow_html=True
+            )
 
     # Chat input
     user_input = st.chat_input("Type your IT help desk question here...")
@@ -168,8 +207,8 @@ def main():
     # Welcome screen
     if not st.session_state.messages:
         st.markdown("""
-            <div style="text-align:center; padding:40px; background-color:#f5f5f5; border-radius:10px;">
-                <h3>👋 Welcome to IT Help Desk Chatbot!</h3>
+            <div style="text-align:center; padding:40px; background-color:#e8eaf6; border-radius:10px;">
+                <h3 style="color:#3949ab;">👋 Welcome to IT Help Desk Chatbot!</h3>
             </div>
         """, unsafe_allow_html=True)
 

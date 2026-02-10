@@ -17,6 +17,16 @@ st.set_page_config(
 # Custom CSS
 st.markdown("""
     <style>
+    /* App background - light blue (fill all white areas) */
+    [data-testid="stAppViewContainer"],
+    .stApp,
+    .main .block-container,
+    section[data-testid="stSidebar"],
+    section.main .block-container,
+    div[data-testid="stVerticalBlock"] > div,
+    .stChatInputContainer,
+    header[data-testid="stHeader"] { background-color: #d4e4f7 !important; }
+    .main { background-color: #d4e4f7 !important; }
     .main-header {
         position: relative;
         text-align: center;
@@ -47,6 +57,8 @@ st.markdown("""
         background-color: #f3e5f5;
         border-left: 5px solid #9c27b0;
     }
+    /* Logo column - no white background, transparent so app background shows */
+    [data-testid="column"]:first-child .stImage img { background: transparent !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -79,19 +91,16 @@ def display_chat_message(role: str, content: str, sources: list = None):
 
 
 def main():
-    # ---------- TOP LEFT IMAGE ----------
+    # ---------- TOP LEFT LOGO (watermark-style, larger & visible) ----------
     left_col, right_col = st.columns([1, 6])
 
     with left_col:
-        st.image(
-            r"image.png",
-            width=120
-        )
+        st.image(r"image.png", width=150)
 
     # ---------- HEADER ----------
     st.markdown("""
         <div class="main-header">
-            <h1>🤖 IT Help Desk Chatbot</h1>
+            <h1> Cognida.ai IT Help Desk Chatbot</h1>
             <p class="header-tagline">Powered by RAG & Grok LLM</p>
         </div>
     """, unsafe_allow_html=True)
@@ -104,9 +113,6 @@ def main():
 
     with col1:
         st.markdown("### 💬 Chat-Interface view")
-
-    # with col2:
-    #     show_debug = st.checkbox("Show Debug Info", value=False)
 
     # Load RAG backend
     try:
@@ -157,19 +163,6 @@ def main():
 
         display_chat_message('assistant', result['response'], result['sources'])
 
-        # Debug info
-        # if show_debug and result.get('relevant_chunks'):
-        #     with st.expander("🔍 Debug: Retrieved Chunks"):
-        #         for i, (chunk, score) in enumerate(result['relevant_chunks'], 1):
-        #             st.markdown(f"**Chunk {i}** (Similarity: {score:.3f})")
-        #             st.markdown(f"*Source: {chunk['source']}*")
-        #             st.text(
-        #                 chunk['text'][:200] + "..."
-        #                 if len(chunk['text']) > 200
-        #                 else chunk['text']
-        #             )
-        #             st.markdown("---")
-
         st.rerun()
 
     # Welcome screen
@@ -177,7 +170,6 @@ def main():
         st.markdown("""
             <div style="text-align:center; padding:40px; background-color:#f5f5f5; border-radius:10px;">
                 <h3>👋 Welcome to IT Help Desk Chatbot!</h3>
-                <p>Ask questions about password resets, troubleshooting, or system configurations.</p>
             </div>
         """, unsafe_allow_html=True)
 

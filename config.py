@@ -6,9 +6,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# LLM Provider Selection - Groq (free)
-# Options: "grok", "openai", "groq"
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")
+# LLM Provider Selection - gemini (Google), groq (free), grok, openai
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")
+
+# Google Gemini API Configuration (AIzaSy... key from https://aistudio.google.com/apikey)
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 
 # Grok API Configuration
 GROK_API_KEY = os.getenv("GROK_API_KEY", "")

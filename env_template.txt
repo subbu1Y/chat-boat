@@ -1,6 +1,10 @@
-# LLM Provider Configuration - Grok (x.ai)
-# Choose one: "grok", "openai", or "groq"
-LLM_PROVIDER=grok
+# LLM Provider Configuration
+# Choose one: "gemini", "grok", "openai", or "groq"
+LLM_PROVIDER=gemini
+
+# Google Gemini API (free tier at https://aistudio.google.com/apikey)
+GOOGLE_API_KEY=your_google_api_key_here
+# GEMINI_MODEL=gemini-2.0-flash
 
 # Grok API Configuration (requires credits)
 # Get your API key from: https://console.x.ai/

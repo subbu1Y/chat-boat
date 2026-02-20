@@ -82,6 +82,22 @@ class RAGBackend:
                     print(f"Error initializing Groq client: {e}")
             else:
                 print("Warning: GROQ_API_KEY not set. Please set it in .env file")
+
+        elif self.llm_provider == "gemini":
+            if config.GOOGLE_API_KEY:
+                try:
+                    import google.generativeai as genai
+                    genai.configure(api_key=config.GOOGLE_API_KEY)
+                    self.gemini_model = genai.GenerativeModel(config.GEMINI_MODEL)
+                    self.model_name = config.GEMINI_MODEL
+                    self.client = "gemini"
+                    print(f"Using Google Gemini LLM: {self.model_name}")
+                except Exception as e:
+                    self.client = None
+                    self.init_error = str(e)
+                    print(f"Error initializing Gemini client: {e}")
+            else:
+                print("Warning: GOOGLE_API_KEY not set. Please set it in .env file")
         
         if not self.client:
             print(f"No valid API key found or client failed to initialize for provider: {self.llm_provider}")
@@ -217,17 +233,27 @@ Instructions for your response:
                 "Use bullet points or numbered steps when explaining procedures. "
                 "Base answers on the provided context; if context is missing, say so and give brief general guidance."
             )
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {"role": "system", "content": system_instruction},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=config.TEMPERATURE,
-                max_tokens=config.MAX_TOKENS
-            )
-            
-            answer = response.choices[0].message.content
+            if self.client == "gemini":
+                full_prompt = f"{system_instruction}\n\n{prompt}"
+                response = self.gemini_model.generate_content(
+                    full_prompt,
+                    generation_config={
+                        "temperature": config.TEMPERATURE,
+                        "max_output_tokens": config.MAX_TOKENS,
+                    }
+                )
+                answer = response.text if response.text else ""
+            else:
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=config.TEMPERATURE,
+                    max_tokens=config.MAX_TOKENS
+                )
+                answer = response.choices[0].message.content
 
             # Footer line at the end of every assistant response
             footer = "\n\n---\nIf the issue is not resolved or it is an access-based issue, please reach out or send an email to Cognida_IT@cognida.ai"

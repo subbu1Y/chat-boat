@@ -1,6 +1,6 @@
 # Run Instructions
 
-This project supports two frontends: **Streamlit** and **React (Vite)**. Both can run alongside the FastAPI backend.
+**Primary frontend:** React + Vite. Streamlit is available as legacy/fallback.
 
 ---
 
@@ -36,22 +36,9 @@ python backend/api.py
 
 ---
 
-## 2. Run Streamlit Frontend
+## 2. Run React (Vite) Frontend (Primary)
 
-Can run with or without the backend. If backend is down, Streamlit falls back to direct RAG.
-
-```powershell
-cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0"
-streamlit run app.py
-```
-
-- **URL:** http://localhost:8501
-
----
-
-## 3. Run React (Vite) Frontend
-
-Requires the backend to be running (for chat, tickets, dashboard).
+Requires the backend to be running.
 
 ```powershell
 cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0\frontend"
@@ -64,7 +51,20 @@ npm run dev
 
 ---
 
-## Quick Start (All Three)
+## 3. Streamlit Frontend (Optional / Legacy)
+
+Can run with or without the backend. If backend is down, Streamlit falls back to direct RAG.
+
+```powershell
+cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0"
+streamlit run app.py
+```
+
+- **URL:** http://localhost:8501
+
+---
+
+## Quick Start (React + Backend)
 
 **Terminal 1 – Backend:**
 ```powershell
@@ -72,17 +72,13 @@ cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0"
 python backend/api.py
 ```
 
-**Terminal 2 – Streamlit:**
-```powershell
-cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0"
-streamlit run app.py
-```
-
-**Terminal 3 – React:**
+**Terminal 2 – React Frontend:**
 ```powershell
 cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0\frontend"
 npm run dev
 ```
+
+Open **http://localhost:5173**
 
 ---
 

@@ -1,13 +1,14 @@
 # IT Help Desk RAG Chatbot 🤖
 
-A Retrieval-Augmented Generation (RAG) based chatbot for IT Help Desk support, powered by Grok LLM and built with Streamlit.
+A Retrieval-Augmented Generation (RAG) based chatbot for IT Help Desk support, powered by Google Gemini (or Grok/Groq) and built with **React + Vite** frontend and FastAPI backend.
 
 ## Features ✨
 
 - 🔍 **Intelligent Document Search**: Uses semantic search with embeddings to find relevant information
-- 💬 **Conversational AI**: Powered by Grok LLM for natural, context-aware responses
+- 💬 **Conversational AI**: Powered by Gemini/Grok/Groq for natural, context-aware responses
 - 📚 **Knowledge Base Management**: Process and index your IT documentation
-- 🎨 **Modern UI**: Clean and intuitive Streamlit interface
+- 🎨 **Modern UI**: React + Vite frontend with Chat, Dashboard, and Ticket Management
+- 📊 **Ticket Dashboard**: KPI cards, charts, and ticket tracking
 - 💾 **JSON Storage**: Lightweight storage for document chunks and embeddings
 - 🔐 **Source Attribution**: Shows which documents were used to generate responses
 
@@ -16,31 +17,34 @@ A Retrieval-Augmented Generation (RAG) based chatbot for IT Help Desk support, p
 ### System Components
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     IT Help Desk Chatbot                     │
-└─────────────────────────────────────────────────────────────┘
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                     │
-   ┌────▼────┐         ┌──────▼──────┐      ┌──────▼──────┐
-   │Streamlit│         │RAG Backend  │      │  Indexer    │
-   │Frontend │◄────────┤(Retrieval & │      │(Doc Process)│
-   │ (app.py)│         │ Generation) │      │(indexer.py) │
-   └─────────┘         └──────┬──────┘      └──────┬──────┘
-                              │                     │
-                    ┌─────────┴─────────┐           │
-                    │                   │           │
-              ┌─────▼─────┐      ┌──────▼──────┐   │
-              │  Grok LLM │      │Embeddings   │   │
-              │    API    │      │(SentenceTr.)│   │
-              └───────────┘      └─────────────┘   │
-                                                    │
-                              ┌─────────────────────┤
-                              │                     │
-                    ┌─────────▼─────┐    ┌─────────▼────────┐
-                    │Document Chunks│    │Document Embeddings│
-                    │   (JSON)      │    │     (JSON)        │
-                    └───────────────┘    └──────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                     IT Help Desk Chatbot                             │
+└─────────────────────────────────────────────────────────────────────┘
+                                    │
+        ┌───────────────────────────┼───────────────────────────┐
+        │                           │                           │
+   ┌────▼────┐               ┌─────▼─────┐               ┌─────▼─────┐
+   │ React   │               │  FastAPI  │               │  Indexer  │
+   │ (Vite)  │◄── /api/* ────┤  Backend  │◄──────────────┤(indexer)  │
+   │ :5173   │               │  :8000    │               └───────────┘
+   └─────────┘               └─────┬─────┘
+        │                           │
+        │                    ┌──────┴──────┐
+        │                    │ RAG Backend │
+        │                    │ (rag_backend)│
+        │                    └──────┬──────┘
+        │                           │
+        │               ┌────────────┴────────────┐
+        │               │                        │
+        │         ┌─────▼─────┐          ┌──────▼──────┐
+        │         │ Gemini/   │          │ Embeddings  │
+        │         │ Grok/Groq │          │(SentenceTr.)│
+        │         └───────────┘          └─────────────┘
+        │
+   ┌────▼────┐  (optional - legacy)
+   │Streamlit│  streamlit run app.py
+   │ app.py  │
+   └─────────┘
 ```
 
 ### How RAG Works in This System
@@ -61,27 +65,31 @@ A Retrieval-Augmented Generation (RAG) based chatbot for IT Help Desk support, p
 ### Prerequisites
 
 - Python 3.8 or higher
-- Grok API Key from [X.AI](https://console.x.ai/)
+- Node.js 18+ (for React frontend)
+- API Key: **Gemini** ([aistudio.google.com](https://aistudio.google.com/apikey)), **Groq** ([console.groq.com](https://console.groq.com/keys)), or **Grok** ([console.x.ai](https://console.x.ai/))
 - Internet connection for downloading models
 
 ### Setup Steps
 
 1. **Clone or download this repository**
 
-2. **Install dependencies**:
+2. **Install Python dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Create .env file** in the project root:
+3. **Create .env file** in the project root (copy from `env_template.txt`):
 ```bash
-# Create .env file
-echo GROK_API_KEY=your_grok_api_key_here > .env
+LLM_PROVIDER=gemini
+GOOGLE_API_KEY=your_google_api_key_here
 ```
 
-Replace `your_grok_api_key_here` with your actual Grok API key from [https://console.x.ai/](https://console.x.ai/)
+4. **Install frontend dependencies** (for React):
+```bash
+cd frontend && npm install
+```
 
-4. **Add your IT documentation** to the `sample_documents/` folder:
+5. **Add your IT documentation** to the `sample_documents/` folder:
    - Supported formats: `.txt`, `.md`
    - Files already included as examples
 
@@ -124,13 +132,27 @@ Indexing Complete!
 
 ### Step 2: Run the Chatbot
 
-Start the Streamlit application:
+**Option A: React + Vite (Recommended)**
+
+1. Start the FastAPI backend:
+```bash
+python backend/api.py
+```
+
+2. Start the React frontend:
+```bash
+cd frontend && npm run dev
+```
+
+3. Open **http://localhost:5173** in your browser
+
+**Option B: Streamlit (Legacy)**
 
 ```bash
 streamlit run app.py
 ```
 
-The application will open in your default web browser at `http://localhost:8501`
+Opens at `http://localhost:8501`. Streamlit calls the backend when running; if backend is down, it falls back to direct RAG.
 
 ### Step 3: Ask Questions
 
@@ -244,23 +266,25 @@ MAX_TOKENS = 1000             # Maximum response length
 ## Project Structure 📁
 
 ```
-Chatbot/
-├── app.py                          # Streamlit frontend
+Chat-bot 2.0/
+├── backend/                        # FastAPI backend
+│   └── api.py                     # REST API (chat, tickets, dashboard)
+├── frontend/                       # React + Vite frontend
+│   ├── src/
+│   │   ├── components/            # Chat, Dashboard, TicketForm, Sidebar, Header
+│   │   └── services/api.js        # Axios API client
+│   ├── package.json
+│   └── vite.config.js
+├── app.py                          # Streamlit frontend (legacy)
 ├── rag_backend.py                  # RAG logic & LLM integration
 ├── indexer.py                      # Document processing & indexing
 ├── config.py                       # Configuration settings
-├── requirements.txt                # Python dependencies
-├── .env                           # API keys (create this)
-├── README.md                      # This file
-├── sample_documents/              # Your IT documentation
-│   ├── password_reset.txt
-│   ├── vpn_access.txt
-│   ├── printer_troubleshooting.txt
-│   ├── email_issues.txt
-│   └── hardware_issues.txt
-└── knowledge_base/                # Generated by indexer
-    ├── document_index.json        # Chunked documents
-    └── embeddings.json            # Vector embeddings
+├── tickets.py                      # Ticket storage & dashboard stats
+├── requirements.txt
+├── .env                            # API keys (create this)
+├── RUN_INSTRUCTIONS.md             # Run commands
+├── sample_documents/
+└── knowledge_base/
 ```
 
 ## Adding New Documents 📄
@@ -375,11 +399,11 @@ To extend this chatbot:
 
 ## Tech Stack 🛠️
 
-- **Frontend**: Streamlit
-- **Backend**: Python
-- **LLM**: Grok (X.AI)
+- **Frontend**: React + Vite (primary), Streamlit (legacy)
+- **Backend**: FastAPI
+- **LLM**: Google Gemini, Grok, Groq, or OpenAI (configurable)
 - **Embeddings**: Sentence Transformers (all-MiniLM-L6-v2)
-- **Storage**: JSON files
+- **Storage**: JSON files (or PostgreSQL optional)
 - **Vector Search**: NumPy (cosine similarity)
 
 ## License 📄

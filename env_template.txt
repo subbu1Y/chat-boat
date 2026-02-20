@@ -1,6 +1,6 @@
-# LLM Provider Configuration
+# LLM Provider Configuration - Grok (x.ai)
 # Choose one: "grok", "openai", or "groq"
-LLM_PROVIDER=groq
+LLM_PROVIDER=grok
 
 # Grok API Configuration (requires credits)
 # Get your API key from: https://console.x.ai/
@@ -14,9 +14,37 @@ OPENAI_API_KEY=your_openai_api_key_here
 # Get your API key from: https://console.groq.com/keys
 GROQ_API_KEY=your_groq_api_key_here
 
+# Email Notification Configuration (for ticket alerts)
+# Sends email to specified address when new tickets are created
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+NOTIFICATION_EMAIL=subrahmanyam.pillalamarri@cognida.ai
+
+# Gmail App Password Setup (if using Gmail):
+# 1. Go to https://myaccount.google.com/apppasswords
+# 2. Generate an "App Password" for "Mail"
+# 3. Use that 16-character password as SMTP_PASSWORD
+# Note: Regular Gmail password won't work - you MUST use App Password
+
+# API Configuration (Streamlit calls FastAPI - optional override)
+# API_BASE_URL=http://localhost:8000
+
+# PostgreSQL Database Configuration (Optional)
+# Leave USE_DATABASE=false to use JSON file storage (default)
+USE_DATABASE=false
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=helpdesk_db
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password
+
 # Instructions:
 # 1. Choose your LLM_PROVIDER (groq is free and fast!)
 # 2. Add the corresponding API key
-# 3. Save this file as ".env" (without .txt extension)
-# 4. Restart your Streamlit app
+# 3. (Optional) Configure email notifications for ticket alerts
+# 4. (Optional) Configure PostgreSQL database for ticket/chat storage
+# 5. Save this file as ".env" (without .txt extension)
+# 6. Restart your Streamlit app
 

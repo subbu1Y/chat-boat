@@ -1,0 +1,87 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #e8eef5;
+}
+
+.app-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+  max-width: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 280px;
+  background-color: rgb(32, 33, 35);
+  color: #ECECF1;
+  padding: 1rem;
+  overflow-y: auto;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: rgb(52, 53, 65);
+  color: #ECECF1;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: background-color 0.2s;
+}
+
+.sidebar button:hover {
+  background-color: rgb(42, 43, 45);
+}
+
+.sidebar hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 1rem 0;
+}
+
+.sidebar h3 {
+  font-size: 0.85em;
+  color: #CCCCCC;
+  margin: 20px 0 8px 0;
+}
+
+.sidebar .caption {
+  font-size: 0.85em;
+  color: #9B9B9B;
+  margin-bottom: 8px;
+}
+
+.sidebar .message-preview {
+  font-size: 0.85em;
+  color: #ECECF1;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 240px;
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+}

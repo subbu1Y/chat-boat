@@ -6,14 +6,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# LLM Provider Selection
+# LLM Provider Selection - Groq (free)
 # Options: "grok", "openai", "groq"
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "grok")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq")
 
 # Grok API Configuration
 GROK_API_KEY = os.getenv("GROK_API_KEY", "")
 GROK_API_BASE = "https://api.x.ai/v1"
-GROK_MODEL = "grok-beta"
+GROK_MODEL = "grok-3"
 
 # OpenAI API Configuration (alternative)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
@@ -44,3 +44,12 @@ MAX_HISTORY = 10  # maximum chat history to maintain
 TEMPERATURE = 0.4  # lower = more focused and consistent answers
 MAX_TOKENS = 1500  # allow longer, complete responses
 
+# API Configuration (for Streamlit calling FastAPI backend)
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+
+# Email Notification Configuration
+SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+NOTIFICATION_EMAIL = os.getenv("NOTIFICATION_EMAIL", "subrahmanyam.pillalamarri@cognida.ai")

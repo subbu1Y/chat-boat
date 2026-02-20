@@ -1,0 +1,152 @@
+.dashboard {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.dashboard-header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.kpi-header {
+  background: #3f51b5;
+  color: white;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.kpi-value {
+  padding: 20px 14px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  text-align: center;
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.chart-panel {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.chart-header {
+  background: #3f51b5;
+  color: white;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.chart-body {
+  padding: 16px;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 2rem 0;
+}
+
+.tickets-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.no-tickets {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.tickets-list {
+  margin-bottom: 2rem;
+}
+
+.ticket-item {
+  background: #f8f7ff;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+}
+
+.ticket-item summary {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.ticket-details {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.ticket-details p {
+  margin-bottom: 0.5rem;
+  color: #4a5568;
+}
+
+.ticket-date {
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.back-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, #4a57c8 0%, #5b36b1 100%);
+}
+
+.dashboard-loading, .dashboard-error {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #6b7280;
+}

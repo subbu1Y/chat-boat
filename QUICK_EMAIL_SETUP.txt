@@ -1,0 +1,56 @@
+========================================
+QUICK EMAIL SETUP FOR TICKET NOTIFICATIONS
+========================================
+
+Email notifications are currently NOT configured.
+To receive emails when tickets are created, follow these steps:
+
+STEP 1: Get Gmail App Password
+------------------------------
+1. Go to: https://myaccount.google.com/apppasswords
+2. Sign in with your Gmail account
+3. Select "App" -> "Mail"
+4. Select "Device" -> "Other" (type "Help Desk")
+5. Click "Generate"
+6. Copy the 16-character password (example: "abcd efgh ijkl mnop")
+
+STEP 2: Update .env File
+-------------------------
+Open the file: .env
+Add these lines at the end:
+
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your.email@gmail.com
+SMTP_PASSWORD=abcd efgh ijkl mnop
+NOTIFICATION_EMAIL=subrahmanyam.pillalamarri@cognida.ai
+
+Replace:
+- your.email@gmail.com with YOUR Gmail address
+- abcd efgh ijkl mnop with the App Password from Step 1
+
+STEP 3: Restart Streamlit
+--------------------------
+Stop the Streamlit app (Ctrl+C in terminal)
+Run: streamlit run app.py
+
+STEP 4: Test
+------------
+Create a test ticket in the app
+Check subrahmanyam.pillalamarri@cognida.ai inbox
+
+TROUBLESHOOTING
+---------------
+- If email doesn't send: Check the Streamlit terminal for error messages
+- "Authentication failed": Make sure you're using App Password, not regular password
+- "Connection timeout": Check your firewall/antivirus settings
+
+ALTERNATIVE: Use Outlook/Office 365
+------------------------------------
+SMTP_SERVER=smtp.office365.com
+SMTP_PORT=587
+SMTP_USERNAME=your.email@outlook.com
+SMTP_PASSWORD=your_password
+NOTIFICATION_EMAIL=subrahmanyam.pillalamarri@cognida.ai
+
+========================================

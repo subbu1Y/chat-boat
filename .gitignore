@@ -17,12 +17,18 @@ env/
 # Streamlit
 .streamlit/secrets.toml
 
+# Ticket storage (local JSON)
+tickets.json
+
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
+
+# Node / React
+node_modules/
 
 # OS
 .DS_Store

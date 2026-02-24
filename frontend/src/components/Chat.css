@@ -8,10 +8,11 @@
   padding: 1.5rem 2rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   flex: 1;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .chat-section-title {
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: #4a5568;
   margin-bottom: 14px;
@@ -31,6 +32,7 @@
   box-shadow: 0 4px 24px rgba(90,103,216,0.08);
   flex: 1;
   min-height: 360px;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .welcome-icon {
@@ -39,7 +41,7 @@
 }
 
 .welcome-title {
-  font-size: 1.65rem;
+  font-size: 1.9rem;
   font-weight: 700;
   color: #2d3748;
   margin: 0 0 8px 0;
@@ -47,7 +49,7 @@
 }
 
 .welcome-subtitle {
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: #718096;
   margin: 0 0 20px 0;
 }
@@ -89,19 +91,19 @@
 .welcome-feature-item strong {
   display: block;
   color: #2d3748;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   margin-bottom: 3px;
 }
 
 .welcome-feature-item p {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #718096;
   line-height: 1.4;
 }
 
 .welcome-hint {
-  font-size: 0.88rem;
+  font-size: 1.05rem;
   color: #a0aec0;
   margin: 0 0 20px 0;
 }
@@ -116,7 +118,7 @@
   color: #ECECF1;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -136,7 +138,8 @@
   border-radius: 12px;
   margin-bottom: 12px;
   line-height: 1.6;
-  font-size: 15px;
+  font-size: 17px;
+  font-family: "Times New Roman", Times, serif;
   border: 1px solid #e5e5e5;
 }
 
@@ -148,6 +151,13 @@
 .assistant-message {
   background-color: #f7f7f8;
   border-left: none;
+}
+
+.message-content {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 17px;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .typing-indicator {
@@ -196,7 +206,8 @@
   flex: 1;
   border: none;
   outline: none;
-  font-size: 1em;
+  font-size: 1.1rem;
+  font-family: "Times New Roman", Times, serif;
   padding: 8px;
 }
 
@@ -210,7 +221,7 @@
   color: white;
   border: none;
   border-radius: 20px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;

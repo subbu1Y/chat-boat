@@ -150,3 +150,34 @@
   font-size: 1.2rem;
   color: #6b7280;
 }
+
+.dashboard-error h3 {
+  margin: 0 0 1rem 0;
+  color: #374151;
+}
+
+.dashboard-error .error-detail {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-error .error-hint {
+  font-size: 0.9rem;
+  color: #3f51b5;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-error .retry-btn {
+  padding: 10px 20px;
+  background: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dashboard-error .retry-btn:hover {
+  background: #303f9f;
+}

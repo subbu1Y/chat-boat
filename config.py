@@ -2,12 +2,15 @@
 Configuration file for RAG Chatbot
 """
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env from project root (parent of this file) - ensures correct path when backend runs
+_env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(_env_path, override=True)
 
-# LLM Provider Selection - gemini (Google), groq (free), grok, openai
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")
+# LLM Provider Selection - groq (free), gemini, grok, openai
+LLM_PROVIDER = (os.getenv("LLM_PROVIDER", "groq") or "groq").strip().lower()
 
 # Google Gemini API Configuration (AIzaSy... key from https://aistudio.google.com/apikey)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")

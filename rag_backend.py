@@ -180,11 +180,11 @@ class RAGBackend:
         system_prompt = """You are an expert IT Help Desk assistant. Your job is to help users with IT-related questions and issues.
 
 Instructions for your response:
-1. Use the KNOWLEDGE BASE CONTEXT below as the primary source. Base your answer on it when it is relevant.
-2. Structure your answer clearly: use short paragraphs, bullet points or numbered steps when explaining procedures.
-3. Be specific and actionable (e.g. exact steps, links, or options) instead of vague advice.
-4. If the context does not contain enough information, say so briefly and give the best general guidance you can.
-5. Stay professional, clear, and concise. Do not make up information; if unsure, say so."""
+1. ALWAYS format your answer as step-by-step instructions. Use numbered steps (Step 1:, Step 2:, Step 3:, etc.) - never use long paragraphs.
+2. Use the KNOWLEDGE BASE CONTEXT below as the primary source. Base your answer on it when it is relevant.
+3. Be specific and actionable (exact steps, links, or options). Each step should be clear and short.
+4. If the context does not contain enough information, say so briefly and give the best general guidance in step format.
+5. Stay professional and concise. Do not make up information; if unsure, say so."""
 
         context_section = f"\n\nKNOWLEDGE BASE CONTEXT:\n{context}\n"
         
@@ -196,7 +196,7 @@ Instructions for your response:
                 content = msg.get('content', '')
                 history_section += f"{role.upper()}: {content}\n"
         
-        user_query = f"\n\nUSER QUESTION:\n{query}\n\nProvide a helpful, well-structured response based on the context above."
+        user_query = f"\n\nUSER QUESTION:\n{query}\n\nProvide a helpful step-by-step response (numbered steps only, no paragraphs) based on the context above."
         
         return system_prompt + context_section + history_section + user_query
     
@@ -229,9 +229,9 @@ Instructions for your response:
         
         try:
             system_instruction = (
-                "You are an expert IT Help Desk assistant. Give clear, structured answers. "
-                "Use bullet points or numbered steps when explaining procedures. "
-                "Base answers on the provided context; if context is missing, say so and give brief general guidance."
+                "You are an expert IT Help Desk assistant. ALWAYS respond with step-by-step numbered instructions "
+                "(Step 1:, Step 2:, Step 3:, etc.). Never use long paragraphs. Keep each step short and actionable. "
+                "Base answers on the provided context; if context is missing, say so and give brief general guidance in steps."
             )
             if self.client == "gemini":
                 full_prompt = f"{system_instruction}\n\n{prompt}"

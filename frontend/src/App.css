@@ -38,7 +38,7 @@
   color: #ECECF1;
   border: none;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
   margin-bottom: 8px;
   transition: background-color 0.2s;
@@ -55,19 +55,19 @@
 }
 
 .sidebar h3 {
-  font-size: 0.85em;
+  font-size: 1rem;
   color: #CCCCCC;
   margin: 20px 0 8px 0;
 }
 
 .sidebar .caption {
-  font-size: 0.85em;
+  font-size: 0.95rem;
   color: #9B9B9B;
   margin-bottom: 8px;
 }
 
 .sidebar .message-preview {
-  font-size: 0.85em;
+  font-size: 0.95rem;
   color: #ECECF1;
   margin-bottom: 4px;
   overflow: hidden;

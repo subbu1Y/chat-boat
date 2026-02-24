@@ -9,12 +9,14 @@ function Dashboard({ onBack }) {
   const [stats, setStats] = useState(null)
   const [tickets, setTickets] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     loadDashboard()
   }, [])
 
   const loadDashboard = async () => {
+    setError(null)
     try {
       const [statsData, ticketsData] = await Promise.all([
         getDashboardStats(),
@@ -22,8 +24,14 @@ function Dashboard({ onBack }) {
       ])
       setStats(statsData)
       setTickets(ticketsData)
-    } catch (error) {
-      console.error('Failed to load dashboard:', error)
+    } catch (err) {
+      console.error('Failed to load dashboard:', err)
+      const msg = err?.response?.data?.detail || err?.message || String(err)
+      const isNetwork = err?.code === 'ERR_NETWORK' || err?.message?.includes('Network')
+      setError({
+        message: msg,
+        hint: isNetwork ? 'Make sure the FastAPI backend is running: python backend/api.py' : null
+      })
     } finally {
       setLoading(false)
     }
@@ -34,7 +42,24 @@ function Dashboard({ onBack }) {
   }
 
   if (!stats) {
-    return <div className="dashboard-error">Failed to load dashboard data</div>
+    return (
+      <div className="dashboard-error">
+        <h3>Failed to load dashboard data</h3>
+        {error && (
+          <>
+            <p className="error-detail">{error.message}</p>
+            {error.hint && <p className="error-hint">{error.hint}</p>}
+            {!error.hint && <p className="error-hint">Check browser console (F12) for details.</p>}
+          </>
+        )}
+        <button className="retry-btn" onClick={() => { setLoading(true); loadDashboard(); }}>
+          Retry
+        </button>
+        <button className="back-btn" onClick={onBack} style={{ marginLeft: 8 }}>
+          ← Back to chat
+        </button>
+      </div>
+    )
   }
 
   const priorityData = Object.entries(stats.by_priority).map(([key, value]) => ({

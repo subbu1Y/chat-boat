@@ -34,9 +34,7 @@ function App() {
         <Sidebar 
           messages={messages}
           onNewChat={handleNewChat}
-          onDashboardClick={handleDashboardToggle}
           onCreateTicket={handleTicketFormToggle}
-          showDashboard={showDashboard}
           showTicketForm={showTicketForm}
         />
         <div className="main-content">

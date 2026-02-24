@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getTickets } from '../services/api'
 
-function Sidebar({ messages, onNewChat, onDashboardClick, onCreateTicket, showDashboard, showTicketForm }) {
+function Sidebar({ messages, onNewChat, onCreateTicket, showTicketForm }) {
   const [recentTickets, setRecentTickets] = useState([])
 
   useEffect(() => {
@@ -32,14 +32,8 @@ function Sidebar({ messages, onNewChat, onDashboardClick, onCreateTicket, showDa
       
       <hr />
       
-      <button onClick={onDashboardClick}>📊 Dashboard</button>
-      
       {showTicketForm && (
         <button onClick={() => onCreateTicket()}>✖ Cancel</button>
-      )}
-      
-      {showDashboard && (
-        <button onClick={() => onDashboardClick()}>← Back to chat</button>
       )}
       
       <hr />

@@ -2,6 +2,7 @@
 FastAPI Backend for IT Help Desk Chatbot
 Serves REST API for React frontend and Streamlit (when Streamlit uses /api/chat).
 """
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -17,7 +18,22 @@ from tickets import create_ticket, get_tickets, get_all_tickets, get_dashboard_s
 from email_notifier import send_ticket_notification
 import config
 
-app = FastAPI(title="IT Help Desk API", version="1.0.0")
+# Initialize RAG backend (set in lifespan)
+rag_backend = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global rag_backend
+    try:
+        rag_backend = RAGBackend()
+        print("[API] RAG backend initialized successfully")
+    except Exception as e:
+        print(f"[API] Error loading RAG backend: {e}")
+    yield
+
+
+app = FastAPI(title="IT Help Desk API", version="1.0.0", lifespan=lifespan)
 
 # CORS configuration - allow React frontend (Vite dev server)
 app.add_middleware(
@@ -33,18 +49,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize RAG backend
-rag_backend = None
-
-@app.on_event("startup")
-async def startup_event():
-    global rag_backend
-    try:
-        rag_backend = RAGBackend()
-        print("[API] RAG backend initialized successfully")
-    except Exception as e:
-        print(f"[API] Error loading RAG backend: {e}")
-
 
 # Request/Response Models
 class ChatRequest(BaseModel):
@@ -53,7 +57,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     response: str
-    sources: List[dict] = []
+    sources: List[str] = []  # RAG returns source filenames as strings
 
 class TicketRequest(BaseModel):
     subject: str
@@ -182,4 +186,5 @@ async def get_config():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    # Use import string so reload works. Run from project root: python backend/api.py
+    uvicorn.run("backend.api:app", host="0.0.0.0", port=8000, reload=True)

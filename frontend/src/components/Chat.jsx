@@ -45,11 +45,15 @@ function Chat({ messages, setMessages, onCreateTicket }) {
       setMessages([...newMessages, assistantMessage])
     } catch (error) {
       console.error('Chat error:', error)
-      const errorMessage = {
-        role: 'assistant',
-        content: 'Sorry, I encountered an error processing your request. Please try again.'
+      let errText = 'Sorry, I encountered an error processing your request. Please try again.'
+      if (error?.response?.data?.detail) {
+        errText = String(error.response.data.detail)
+      } else if (error?.response?.status === 503) {
+        errText = 'Backend is still loading. Please wait a moment and try again.'
+      } else if (error?.code === 'ERR_NETWORK' || error?.message?.includes('Network')) {
+        errText = 'Cannot reach the backend. Make sure the API is running: python backend/api.py'
       }
-      setMessages([...newMessages, errorMessage])
+      setMessages([...newMessages, { role: 'assistant', content: errText }])
     } finally {
       setLoading(false)
     }
@@ -99,7 +103,7 @@ function Chat({ messages, setMessages, onCreateTicket }) {
             <div key={index} className={`message ${msg.role}-message`}>
               <strong>{msg.role === 'user' ? '👤' : '🤖'} {msg.role === 'user' ? 'User' : 'Assistant'}:</strong>
               <br />
-              {msg.content}
+              <div className="message-content">{msg.content}</div>
             </div>
           ))}
           {loading && (

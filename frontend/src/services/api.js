@@ -11,8 +11,15 @@ const api = axios.create({
 });
 
 // Chat API
-export const sendChatMessage = async (message, history = []) => {
-  const response = await api.post('/chat', { message, history });
+export const sendChatMessage = async (message, history = [], sessionId = null) => {
+  const body = { message, history };
+  if (sessionId) body.session_id = sessionId;
+  const response = await api.post('/chat', body);
+  return response.data;
+};
+
+export const getChatHistory = async (sessionId) => {
+  const response = await api.get(`/chat/history/${sessionId}`);
   return response.data;
 };
 

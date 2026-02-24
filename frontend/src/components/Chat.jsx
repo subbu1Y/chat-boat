@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { sendChatMessage } from '../services/api'
 import './Chat.css'
 
-function Chat({ messages, setMessages, onCreateTicket }) {
+function Chat({ messages, setMessages, onCreateTicket, sessionId }) {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const messagesEndRef = useRef(null)
@@ -35,7 +35,7 @@ function Chat({ messages, setMessages, onCreateTicket }) {
 
     try {
       const history = messages.map(m => ({ role: m.role, content: m.content }))
-      const response = await sendChatMessage(input.trim(), history)
+      const response = await sendChatMessage(input.trim(), history, sessionId)
       
       const assistantMessage = { 
         role: 'assistant', 

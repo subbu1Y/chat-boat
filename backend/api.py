@@ -25,6 +25,16 @@ rag_backend = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global rag_backend
+    # Initialize PostgreSQL if enabled
+    try:
+        from database import init_database, USE_DATABASE
+        if USE_DATABASE:
+            init_database()
+        else:
+            print("[API] PostgreSQL disabled (USE_DATABASE=false). Using JSON storage.")
+    except ImportError:
+        print("[API] Database module not available. Using JSON storage.")
+    # Initialize RAG backend
     try:
         rag_backend = RAGBackend()
         print("[API] RAG backend initialized successfully")
@@ -54,6 +64,7 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     message: str
     history: List[dict] = []
+    session_id: Optional[str] = None  # For chat persistence in PostgreSQL
 
 class ChatResponse(BaseModel):
     response: str
@@ -100,17 +111,28 @@ async def root():
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     """
-    Chat endpoint - sends message to RAG backend and returns response
+    Chat endpoint - sends message to RAG backend and returns response.
+    When session_id is provided and PostgreSQL is enabled, saves chat to database.
     """
     if not rag_backend:
         raise HTTPException(status_code=503, detail="RAG backend not initialized")
     
     try:
         result = rag_backend.query(request.message, request.history)
-        return ChatResponse(
-            response=result['response'],
-            sources=result.get('sources', [])
-        )
+        response_text = result['response']
+        sources = result.get('sources', [])
+
+        # Persist chat to PostgreSQL if enabled and session_id provided
+        if request.session_id:
+            try:
+                from database import save_chat_message, USE_DATABASE
+                if USE_DATABASE:
+                    save_chat_message(request.session_id, "user", request.message)
+                    save_chat_message(request.session_id, "assistant", response_text, sources)
+            except ImportError:
+                pass
+
+        return ChatResponse(response=response_text, sources=sources)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -170,6 +192,19 @@ async def get_dashboard_statistics():
         return DashboardStats(**stats)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/chat/history/{session_id}")
+async def get_chat_history(session_id: str):
+    """Get chat history for a session (when PostgreSQL is enabled)."""
+    try:
+        from database import get_chat_history as db_get_history, USE_DATABASE
+        if not USE_DATABASE:
+            return {"messages": []}
+        messages = db_get_history(session_id)
+        return {"messages": messages}
+    except ImportError:
+        return {"messages": []}
 
 
 @app.get("/api/config")

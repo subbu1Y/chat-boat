@@ -87,12 +87,45 @@ Open **http://localhost:5173**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | /api/chat | Chat with RAG backend |
+| GET | /api/chat/history/{session_id} | Get chat history (PostgreSQL) |
 | POST | /api/tickets | Create a ticket |
 | GET | /api/tickets | Get recent tickets |
 | GET | /api/tickets/all | Get all tickets |
 | GET | /api/dashboard/stats | Dashboard statistics |
 | GET | /api/config | Public config |
 | GET | / | Health check |
+
+---
+
+## PostgreSQL Integration (Optional)
+
+The chatbot and ticket dashboard can use PostgreSQL for persistent storage.
+
+**1. Install PostgreSQL** (if not installed)
+
+**2. Create database:**
+```powershell
+psql -U postgres -c "CREATE DATABASE helpdesk_db;"
+```
+
+**3. Configure .env:**
+```
+USE_DATABASE=true
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=helpdesk_db
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password
+```
+
+**4. Run setup script:**
+```powershell
+python scripts/setup_db.py
+```
+
+**5. Restart the backend.** Tickets and chat history will be stored in PostgreSQL.
+
+When `USE_DATABASE=false`, the app uses JSON file storage (tickets.json) — no database required.
 
 ---
 

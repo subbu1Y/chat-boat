@@ -36,7 +36,8 @@ NOTIFICATION_EMAIL=subrahmanyam.pillalamarri@cognida.ai
 # API_BASE_URL=http://localhost:8000
 
 # PostgreSQL Database Configuration (Optional)
-# Leave USE_DATABASE=false to use JSON file storage (default)
+# Set USE_DATABASE=true for persistent tickets + chat history
+# Run: python scripts/setup_db.py after creating the database
 USE_DATABASE=false
 DB_HOST=localhost
 DB_PORT=5432
@@ -48,7 +49,7 @@ DB_PASSWORD=your_postgres_password
 # 1. Choose your LLM_PROVIDER (groq is free and fast!)
 # 2. Add the corresponding API key
 # 3. (Optional) Configure email notifications for ticket alerts
-# 4. (Optional) Configure PostgreSQL database for ticket/chat storage
+# 4. (Optional) PostgreSQL: Create DB, set credentials above, run scripts/setup_db.py
 # 5. Save this file as ".env" (without .txt extension)
 # 6. Restart your Streamlit app
 

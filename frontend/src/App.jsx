@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import Chat from './components/Chat'
@@ -6,16 +6,22 @@ import Dashboard from './components/Dashboard'
 import TicketForm from './components/TicketForm'
 import './App.css'
 
+function generateSessionId() {
+  return crypto.randomUUID ? crypto.randomUUID() : `sess-${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
 function App() {
   const [showDashboard, setShowDashboard] = useState(false)
   const [showTicketForm, setShowTicketForm] = useState(false)
   const [messages, setMessages] = useState([])
+  const [sessionId, setSessionId] = useState(() => generateSessionId())
 
-  const handleNewChat = () => {
+  const handleNewChat = useCallback(() => {
     setMessages([])
+    setSessionId(generateSessionId())
     setShowDashboard(false)
     setShowTicketForm(false)
-  }
+  }, [])
 
   const handleDashboardToggle = () => {
     setShowDashboard(!showDashboard)
@@ -47,6 +53,7 @@ function App() {
               messages={messages}
               setMessages={setMessages}
               onCreateTicket={handleTicketFormToggle}
+              sessionId={sessionId}
             />
           )}
         </div>

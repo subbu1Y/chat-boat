@@ -2,7 +2,9 @@
 PostgreSQL Database Configuration and Connection Manager
 Handles database connections, table creation, and queries.
 """
+import json
 import os
+from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Optional
 import psycopg2
@@ -10,7 +12,9 @@ from psycopg2.extras import RealDictCursor
 from psycopg2.pool import SimpleConnectionPool
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env from project root (same as config.py)
+_env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(_env_path, override=True)
 
 # Database Configuration
 DB_HOST = os.getenv("DB_HOST", "localhost")
@@ -170,6 +174,46 @@ def test_connection() -> bool:
         return False
     finally:
         release_connection(conn)
+
+
+def save_chat_message(session_id: str, role: str, content: str, sources: Optional[str] = None) -> bool:
+    """Save a chat message (user or assistant) to chat_history."""
+    if not USE_DATABASE:
+        return False
+    query = """
+        INSERT INTO chat_history (session_id, role, content, sources)
+        VALUES (%s, %s, %s, %s)
+    """
+    sources_str = json.dumps(sources) if isinstance(sources, (list, dict)) else sources
+    params = (session_id, role, content, sources_str)
+    result = execute_query(query, params, fetch=False)
+    return result is not None
+
+
+def get_chat_history(session_id: str, limit: int = 50) -> List[Dict]:
+    """Load chat history for a session (for future session restore)."""
+    if not USE_DATABASE:
+        return []
+    query = """
+        SELECT role, content, sources, created_at
+        FROM chat_history
+        WHERE session_id = %s
+        ORDER BY created_at ASC
+        LIMIT %s
+    """
+    results = execute_query(query, (session_id, limit))
+    if not results:
+        return []
+    messages = []
+    for row in results:
+        m = {"role": row["role"], "content": row["content"]}
+        if row.get("sources"):
+            try:
+                m["sources"] = json.loads(row["sources"]) if isinstance(row["sources"], str) else row["sources"]
+            except (json.JSONDecodeError, TypeError):
+                pass
+        messages.append(m)
+    return messages
 
 
 # Initialize database on import

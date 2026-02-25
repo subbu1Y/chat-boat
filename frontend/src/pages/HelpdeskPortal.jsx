@@ -4,6 +4,22 @@ import { createHelpdeskTicket } from '../services/api'
 
 const PRIORITIES = ['Low', 'Medium', 'High', 'Critical']
 
+const ASSIGNMENT_MAP = {
+  'Network & Connectivity':  'aditya.kovoor@cognida.ai',
+  'Server & Infrastructure': 'aditya.kovoor@cognida.ai',
+  'Security':                'aditya.kovoor@cognida.ai',
+  'Hardware & Devices':      'aditya.kovoor@cognida.ai',
+  'Network':                 'aditya.kovoor@cognida.ai',
+  'Hardware':                'aditya.kovoor@cognida.ai',
+}
+const ASSIGNEE_NAMES = {
+  'aditya.kovoor@cognida.ai':             'Aditya Kovoor',
+  'subrahmanyam.pillalamarri@cognida.ai': 'Subrahmanyam Pillalamarri',
+}
+function getAssignee(category) {
+  return ASSIGNMENT_MAP[category] || 'subrahmanyam.pillalamarri@cognida.ai'
+}
+
 // Full issue catalog: category → list of specific issue types
 const ISSUE_CATALOG = {
   'Network & Connectivity': [
@@ -181,6 +197,17 @@ export default function HelpdeskPortal() {
             <div className="flex justify-between">
               <span className="text-gray-500 font-medium">Status</span>
               <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">{createdTicket.status}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500 font-medium">Assigned To</span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">
+                  {createdTicket.assigned_to === 'aditya.kovoor@cognida.ai' ? 'AK' : 'SP'}
+                </span>
+                <span className="text-gray-700 text-sm font-semibold">
+                  {ASSIGNEE_NAMES[createdTicket.assigned_to] || createdTicket.assigned_to}
+                </span>
+              </span>
             </div>
           </div>
 
@@ -387,7 +414,7 @@ export default function HelpdeskPortal() {
                     ))}
                   </select>
                 </div>
-              )
+              )}
 
               {/* Priority hint */}
               {form.priority && (
@@ -455,6 +482,17 @@ export default function HelpdeskPortal() {
                 <ReviewRow label="Subject"     value={form.subject} />
                 <ReviewRow label="Category"    value={form.category} />
                 {form.issue_type && <ReviewRow label="Issue Type" value={form.issue_type} />}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-500 font-medium">Assigned To</span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">
+                      {getAssignee(form.category) === 'aditya.kovoor@cognida.ai' ? 'AK' : 'SP'}
+                    </span>
+                    <span className="text-gray-700 text-sm font-medium">
+                      {ASSIGNEE_NAMES[getAssignee(form.category)]}
+                    </span>
+                  </span>
+                </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 font-medium">Priority</span>
                   <span className={`text-xs font-bold px-3 py-1 rounded-full border ${PRIORITY_INFO[form.priority]?.color}`}>

@@ -117,6 +117,17 @@ def create_ticket(subject: str, description: str, priority: str = "Medium", cate
     else:
         existing = _load_tickets_json()
     
+    # Auto-assign based on category
+    ASSIGNMENT_MAP = {
+        "Network & Connectivity":  "aditya.kovoor@cognida.ai",
+        "Server & Infrastructure": "aditya.kovoor@cognida.ai",
+        "Security":                "aditya.kovoor@cognida.ai",
+        "Hardware & Devices":      "aditya.kovoor@cognida.ai",
+        "Network":                 "aditya.kovoor@cognida.ai",
+        "Hardware":                "aditya.kovoor@cognida.ai",
+    }
+    assignee = ASSIGNMENT_MAP.get(category or "", "subrahmanyam.pillalamarri@cognida.ai")
+
     ticket_id = f"TKT-{len(existing) + 1000}"
     ticket = {
         "id": ticket_id,
@@ -124,6 +135,7 @@ def create_ticket(subject: str, description: str, priority: str = "Medium", cate
         "description": description,
         "priority": priority,
         "status": "Open",
+        "assigned_to": assignee,
         "created_at": datetime.now().isoformat(),
     }
     if category:

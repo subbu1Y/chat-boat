@@ -97,6 +97,7 @@ class TicketResponse(BaseModel):
     status: str
     created_at: str
     category: Optional[str] = None
+    assigned_to: Optional[str] = None
 
 class DashboardStats(BaseModel):
     overdue: int
@@ -110,15 +111,42 @@ class DashboardStats(BaseModel):
     by_category: dict
 
 
+# ─────────────────────────── Assignment Routing ─────────────────────────────
+
+# Auto-assignment: infrastructure/security → Aditya, user-support → Subrahmanyam
+ASSIGNMENT_MAP = {
+    "Network & Connectivity":   "aditya.kovoor@cognida.ai",
+    "Server & Infrastructure":  "aditya.kovoor@cognida.ai",
+    "Security":                 "aditya.kovoor@cognida.ai",
+    "Hardware & Devices":       "aditya.kovoor@cognida.ai",
+    "Software & Applications":  "subrahmanyam.pillalamarri@cognida.ai",
+    "Email & Communication":    "subrahmanyam.pillalamarri@cognida.ai",
+    "Access & Permissions":     "subrahmanyam.pillalamarri@cognida.ai",
+    "Other":                    "subrahmanyam.pillalamarri@cognida.ai",
+    # Legacy categories from old form
+    "Network":   "aditya.kovoor@cognida.ai",
+    "Hardware":  "aditya.kovoor@cognida.ai",
+    "Software":  "subrahmanyam.pillalamarri@cognida.ai",
+}
+
+def _auto_assign(category: Optional[str]) -> str:
+    """Return the assignee email based on ticket category."""
+    if not category:
+        return "subrahmanyam.pillalamarri@cognida.ai"
+    return ASSIGNMENT_MAP.get(category, "subrahmanyam.pillalamarri@cognida.ai")
+
+
 # ─────────────────────────── ORM Helpers ────────────────────────────────────
 
 VALID_STATUSES = {"Open", "Pending", "Resolved", "Closed"}
 
 
 def _orm_create_ticket(subject: str, description: str, priority: str, category: Optional[str]) -> dict:
-    """Create ticket using SQLAlchemy ORM."""
+    """Create ticket using SQLAlchemy ORM with auto-assignment."""
     from backend.db_orm import get_db
     from backend.models import Ticket
+
+    assignee = _auto_assign(category)
 
     with get_db() as db:
         count = db.query(Ticket).count()
@@ -130,11 +158,12 @@ def _orm_create_ticket(subject: str, description: str, priority: str, category: 
             priority=priority,
             status="Open",
             category=category,
+            assigned_to=assignee,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow(),
         )
         db.add(ticket)
-        db.flush()  # get DB-assigned id
+        db.flush()
         return ticket.to_dict()
 
 

@@ -9,6 +9,25 @@ const PIE_COLORS  = ['#4f46e5', '#5a67d8', '#818cf8', '#c7d2fe']
 const BAR_COLORS  = { Priority: '#4f46e5', Status: '#5c6bc0', Category: '#818cf8' }
 const STATUSES    = ['Open', 'Pending', 'Resolved', 'Closed']
 
+const ASSIGNEES = {
+  'aditya.kovoor@cognida.ai':              { name: 'Aditya',        initials: 'AK', color: 'bg-violet-100 text-violet-700' },
+  'subrahmanyam.pillalamarri@cognida.ai':  { name: 'Subrahmanyam',  initials: 'SP', color: 'bg-blue-100 text-blue-700' },
+}
+
+function AssigneeBadge({ email }) {
+  if (!email) return <span className="text-gray-300 text-xs">Unassigned</span>
+  const a = ASSIGNEES[email]
+  if (!a) return <span className="text-xs text-gray-500 truncate max-w-32" title={email}>{email.split('@')[0]}</span>
+  return (
+    <div className="flex items-center gap-1.5" title={email}>
+      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${a.color}`}>
+        {a.initials}
+      </span>
+      <span className="text-xs text-gray-700 font-medium">{a.name}</span>
+    </div>
+  )
+}
+
 const PRIORITY_BADGE = {
   High:   'bg-red-100 text-red-700',
   Medium: 'bg-yellow-100 text-yellow-800',
@@ -263,6 +282,7 @@ export default function Dashboard({ onBack }) {
                   <th className="px-5 py-3 text-left font-semibold">Subject</th>
                   <th className="px-5 py-3 text-left font-semibold">Category</th>
                   <th className="px-5 py-3 text-left font-semibold">Priority</th>
+                  <th className="px-5 py-3 text-left font-semibold">Assigned To</th>
                   <th className="px-5 py-3 text-left font-semibold">Status</th>
                   <th className="px-5 py-3 text-left font-semibold">Created</th>
                   <th className="px-5 py-3 text-left font-semibold">Update Status</th>
@@ -276,6 +296,9 @@ export default function Dashboard({ onBack }) {
                     <td className="px-5 py-3 text-gray-500">{ticket.category || '—'}</td>
                     <td className="px-5 py-3">
                       <Badge label={ticket.priority} palette={PRIORITY_BADGE} />
+                    </td>
+                    <td className="px-5 py-3">
+                      <AssigneeBadge email={ticket.assigned_to} />
                     </td>
                     <td className="px-5 py-3">
                       <Badge label={ticket.status} palette={STATUS_BADGE} />

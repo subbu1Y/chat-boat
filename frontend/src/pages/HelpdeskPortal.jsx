@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { createHelpdeskTicket } from '../services/api'
 
@@ -125,9 +125,45 @@ export default function HelpdeskPortal() {
     subject: '', description: '', priority: 'Medium', category: '', issue_type: '',
     attachment_note: '',
   })
-  const [loading, setLoading]         = useState(false)
-  const [error, setError]             = useState('')
+  const [screenshots, setScreenshots]   = useState([])   // [{file, preview, name, size}]
+  const [dragOver, setDragOver]         = useState(false)
+  const fileInputRef                    = useRef(null)
+  const [loading, setLoading]           = useState(false)
+  const [error, setError]               = useState('')
   const [createdTicket, setCreatedTicket] = useState(null)
+
+  const MAX_FILES = 5
+  const MAX_SIZE  = 5 * 1024 * 1024 // 5 MB
+
+  const addFiles = useCallback((files) => {
+    const allowed = ['image/png','image/jpeg','image/jpg','image/gif','image/webp']
+    const valid = Array.from(files).filter(f => allowed.includes(f.type) && f.size <= MAX_SIZE)
+    if (valid.length !== files.length) {
+      setError('Only images (PNG/JPG/GIF/WebP) under 5 MB are allowed.')
+    }
+    setScreenshots(prev => {
+      const combined = [...prev, ...valid.map(f => ({
+        file: f,
+        preview: URL.createObjectURL(f),
+        name: f.name,
+        size: (f.size / 1024).toFixed(0) + ' KB',
+      }))]
+      return combined.slice(0, MAX_FILES)
+    })
+  }, [])
+
+  const removeScreenshot = (idx) => {
+    setScreenshots(prev => {
+      URL.revokeObjectURL(prev[idx].preview)
+      return prev.filter((_, i) => i !== idx)
+    })
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    setDragOver(false)
+    addFiles(e.dataTransfer.files)
+  }
 
   const set = (field, val) => setForm(prev => ({ ...prev, [field]: val }))
 
@@ -151,9 +187,12 @@ export default function HelpdeskPortal() {
     setError('')
     setLoading(true)
     try {
+      const screenshotNote = screenshots.length
+        ? `\n\nAttached screenshots (${screenshots.length}): ${screenshots.map(s => s.name).join(', ')}`
+        : ''
       const ticket = await createHelpdeskTicket({
         subject:     form.subject.trim(),
-        description: `[Raised by: ${form.name} <${form.email}>]${form.department ? ` | Dept: ${form.department}` : ''}\n[Issue Type: ${form.issue_type}]\n\n${form.description.trim()}${form.attachment_note ? `\n\nAttachment note: ${form.attachment_note}` : ''}`,
+        description: `[Raised by: ${form.name} <${form.email}>]${form.department ? ` | Dept: ${form.department}` : ''}\n[Issue Type: ${form.issue_type}]\n\n${form.description.trim()}${form.attachment_note ? `\n\nAttachment note: ${form.attachment_note}` : ''}${screenshotNote}`,
         priority:    form.priority,
         category:    form.category || null,
       })
@@ -211,13 +250,18 @@ export default function HelpdeskPortal() {
             </div>
           </div>
 
+          {screenshots.length > 0 && (
+            <p className="text-xs text-gray-400 mb-2">
+              📎 {screenshots.length} screenshot{screenshots.length > 1 ? 's' : ''} attached
+            </p>
+          )}
           <p className="text-xs text-gray-400 mb-6">
             A confirmation will be sent to <strong>{form.email}</strong>
           </p>
 
           <div className="flex gap-3 justify-center">
             <button
-              onClick={() => { setStep(1); setForm({ name:'',email:'',department:'',subject:'',description:'',priority:'Medium',category:'',issue_type:'',attachment_note:'' }); setCreatedTicket(null) }}
+              onClick={() => { setStep(1); setForm({ name:'',email:'',department:'',subject:'',description:'',priority:'Medium',category:'',issue_type:'',attachment_note:'' }); setScreenshots([]); setCreatedTicket(null) }}
               className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors"
             >
               Raise Another Ticket
@@ -245,13 +289,6 @@ export default function HelpdeskPortal() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              className="flex items-center gap-1.5 text-sm text-indigo-600 font-medium hover:text-indigo-800 transition-colors"
-            >
-              💬 Chat Assistant
-            </Link>
-            <span className="text-gray-200">|</span>
             <Link
               to="/helpdesk"
               className="text-sm px-4 py-1.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
@@ -437,17 +474,73 @@ export default function HelpdeskPortal() {
                 />
               </div>
 
+              {/* ── Screenshot Attachment ── */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Attachment Notes <span className="text-gray-400 font-normal">(optional)</span>
+                  Screenshots <span className="text-gray-400 font-normal">(optional · max {MAX_FILES} files · 5 MB each)</span>
                 </label>
-                <input
-                  type="text"
-                  value={form.attachment_note}
-                  onChange={e => set('attachment_note', e.target.value)}
-                  placeholder="e.g. Screenshot saved at \\shared\screenshots\error.png"
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 placeholder:text-gray-300"
-                />
+
+                {/* Drop Zone */}
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                  onDragLeave={() => setDragOver(false)}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`relative border-2 border-dashed rounded-xl px-5 py-6 text-center cursor-pointer transition-all
+                    ${dragOver
+                      ? 'border-indigo-500 bg-indigo-50'
+                      : 'border-gray-200 hover:border-indigo-400 hover:bg-gray-50'
+                    }`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                    multiple
+                    className="hidden"
+                    onChange={e => addFiles(e.target.files)}
+                  />
+                  <div className="flex flex-col items-center gap-2 pointer-events-none">
+                    <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-sm text-gray-500">
+                      <span className="text-indigo-600 font-semibold">Click to upload</span> or drag &amp; drop
+                    </p>
+                    <p className="text-xs text-gray-400">PNG, JPG, GIF, WebP</p>
+                  </div>
+                </div>
+
+                {/* Thumbnails */}
+                {screenshots.length > 0 && (
+                  <div className="mt-3 grid grid-cols-3 gap-3">
+                    {screenshots.map((s, i) => (
+                      <div key={i} className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+                        <img
+                          src={s.preview}
+                          alt={s.name}
+                          className="w-full h-24 object-cover"
+                        />
+                        {/* Overlay on hover */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); removeScreenshot(i) }}
+                            className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        {/* Filename */}
+                        <div className="px-2 py-1 bg-white border-t border-gray-100">
+                          <p className="text-xs text-gray-600 truncate">{s.name}</p>
+                          <p className="text-xs text-gray-400">{s.size}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {error && <ErrorBox msg={error} />}
@@ -504,6 +597,17 @@ export default function HelpdeskPortal() {
                   <span className="text-gray-700 bg-white border border-gray-100 rounded-lg p-3 text-xs leading-relaxed whitespace-pre-wrap">{form.description}</span>
                 </div>
                 {form.attachment_note && <ReviewRow label="Attachment Note" value={form.attachment_note} />}
+                {screenshots.length > 0 && (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-gray-500 font-medium">Screenshots ({screenshots.length})</span>
+                    <div className="flex flex-wrap gap-2">
+                      {screenshots.map((s, i) => (
+                        <img key={i} src={s.preview} alt={s.name} title={s.name}
+                          className="h-14 w-20 object-cover rounded-lg border border-gray-200" />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {error && <ErrorBox msg={error} />}

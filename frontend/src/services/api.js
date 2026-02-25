@@ -23,9 +23,15 @@ export const getChatHistory = async (sessionId) => {
   return response.data;
 };
 
-// Tickets API
+// Tickets API (chat assistant)
 export const createTicket = async (ticketData) => {
   const response = await api.post('/tickets', ticketData);
+  return response.data;
+};
+
+// Helpdesk Portal dedicated endpoint
+export const createHelpdeskTicket = async (ticketData) => {
+  const response = await api.post('/helpdesk/ticket', ticketData);
   return response.data;
 };
 

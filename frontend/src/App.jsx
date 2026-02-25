@@ -1,16 +1,18 @@
 import { useState, useCallback } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import Chat from './components/Chat'
 import Dashboard from './components/Dashboard'
 import TicketForm from './components/TicketForm'
+import HelpdeskPortal from './pages/HelpdeskPortal'
 import './App.css'
 
 function generateSessionId() {
   return crypto.randomUUID ? crypto.randomUUID() : `sess-${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
-function App() {
+function ChatApp() {
   const [showDashboard, setShowDashboard] = useState(false)
   const [showTicketForm, setShowTicketForm] = useState(false)
   const [messages, setMessages] = useState([])
@@ -37,7 +39,7 @@ function App() {
     <div className="app">
       <Header onDashboardClick={handleDashboardToggle} />
       <div className="app-container">
-        <Sidebar 
+        <Sidebar
           messages={messages}
           onNewChat={handleNewChat}
           onCreateTicket={handleTicketFormToggle}
@@ -49,7 +51,7 @@ function App() {
           ) : showTicketForm ? (
             <TicketForm onClose={() => setShowTicketForm(false)} />
           ) : (
-            <Chat 
+            <Chat
               messages={messages}
               setMessages={setMessages}
               onCreateTicket={handleTicketFormToggle}
@@ -59,6 +61,15 @@ function App() {
         </div>
       </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<ChatApp />} />
+      <Route path="/helpdesk" element={<HelpdeskPortal />} />
+    </Routes>
   )
 }
 

@@ -329,6 +329,32 @@ async def get_dashboard_statistics():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/helpdesk/ticket", response_model=TicketResponse)
+async def create_helpdesk_ticket(ticket: TicketRequest, background_tasks: BackgroundTasks):
+    """
+    Dedicated Cognida.ai Helpdesk Portal endpoint.
+    Same storage as /api/tickets but served from the /helpdesk UI at a distinct URL.
+    """
+    try:
+        from backend.db_orm import orm_available
+        if orm_available():
+            new_ticket = _orm_create_ticket(
+                ticket.subject, ticket.description, ticket.priority, ticket.category
+            )
+        else:
+            from tickets import create_ticket
+            new_ticket = create_ticket(
+                subject=ticket.subject,
+                description=ticket.description,
+                priority=ticket.priority,
+                category=ticket.category,
+            )
+        background_tasks.add_task(send_ticket_notification, new_ticket)
+        return TicketResponse(**new_ticket)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/config")
 async def get_config():
     return {

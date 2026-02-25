@@ -3,7 +3,86 @@ import { Link } from 'react-router-dom'
 import { createHelpdeskTicket } from '../services/api'
 
 const PRIORITIES = ['Low', 'Medium', 'High', 'Critical']
-const CATEGORIES = ['Network', 'Software', 'Hardware', 'Email', 'Access & Permissions', 'Other']
+
+// Full issue catalog: category → list of specific issue types
+const ISSUE_CATALOG = {
+  'Network & Connectivity': [
+    'No internet access',
+    'Slow internet / poor connection',
+    'VPN not connecting',
+    'Wi-Fi not working',
+    'Ethernet / LAN issue',
+    'Remote desktop not connecting',
+    'Firewall / port blocking issue',
+    'Other network issue',
+  ],
+  'Software & Applications': [
+    'Application crashing / freezing',
+    'Software installation required',
+    'License / activation issue',
+    'Application not opening',
+    'Error message in application',
+    'Software update required',
+    'Browser issue',
+    'Other software issue',
+  ],
+  'Hardware & Devices': [
+    'Laptop / Desktop not turning on',
+    'Screen / display issue',
+    'Keyboard or mouse not working',
+    'Printer not printing',
+    'Scanner not working',
+    'USB / peripheral not detected',
+    'Battery or charging issue',
+    'Other hardware issue',
+  ],
+  'Email & Communication': [
+    'Cannot send or receive emails',
+    'Outlook not opening',
+    'Email account setup required',
+    'Calendar / meeting invite issue',
+    'Teams / Slack not working',
+    'Video call / audio issue',
+    'Email signature issue',
+    'Other email issue',
+  ],
+  'Access & Permissions': [
+    'Password reset required',
+    'Account locked out',
+    'Cannot access shared drive / folder',
+    'New user account setup',
+    'Permission denied on system / file',
+    'MFA / 2FA issue',
+    'VPN credentials issue',
+    'Other access issue',
+  ],
+  'Server & Infrastructure': [
+    'Server not responding',
+    'SSH / remote access issue',
+    'Database connection failure',
+    'Cloud service (AWS / Azure / GCP) issue',
+    'Backup / restore issue',
+    'Storage / disk space issue',
+    'Service / process down',
+    'Other server issue',
+  ],
+  'Security': [
+    'Suspected malware / virus',
+    'Phishing email received',
+    'Data loss / accidental deletion',
+    'Suspicious activity on account',
+    'Security policy query',
+    'Other security issue',
+  ],
+  'Other': [
+    'New equipment request',
+    'IT policy / compliance question',
+    'General IT query',
+    'Other (describe below)',
+  ],
+}
+
+const CATEGORIES = Object.keys(ISSUE_CATALOG)
 
 const PRIORITY_INFO = {
   Low:      { color: 'border-green-400  bg-green-50  text-green-700',  icon: '🟢', desc: 'Non-urgent, no work impact' },
@@ -27,7 +106,7 @@ export default function HelpdeskPortal() {
   const [step, setStep] = useState(1)
   const [form, setForm] = useState({
     name: '', email: '', department: '',
-    subject: '', description: '', priority: 'Medium', category: '',
+    subject: '', description: '', priority: 'Medium', category: '', issue_type: '',
     attachment_note: '',
   })
   const [loading, setLoading]         = useState(false)
@@ -45,8 +124,9 @@ export default function HelpdeskPortal() {
     return true
   }
   const validateStep2 = () => {
-    if (!form.subject.trim())  { setError('Subject is required.'); return false }
-    if (!form.category)        { setError('Please select a category.'); return false }
+    if (!form.subject.trim())     { setError('Subject is required.'); return false }
+    if (!form.category)           { setError('Please select a category.'); return false }
+    if (!form.issue_type)         { setError('Please select an issue type.'); return false }
     if (!form.description.trim()) { setError('Description is required.'); return false }
     return true
   }
@@ -57,7 +137,7 @@ export default function HelpdeskPortal() {
     try {
       const ticket = await createHelpdeskTicket({
         subject:     form.subject.trim(),
-        description: `[Raised by: ${form.name} <${form.email}>]${form.department ? ` | Dept: ${form.department}` : ''}\n\n${form.description.trim()}${form.attachment_note ? `\n\nAttachment note: ${form.attachment_note}` : ''}`,
+        description: `[Raised by: ${form.name} <${form.email}>]${form.department ? ` | Dept: ${form.department}` : ''}\n[Issue Type: ${form.issue_type}]\n\n${form.description.trim()}${form.attachment_note ? `\n\nAttachment note: ${form.attachment_note}` : ''}`,
         priority:    form.priority,
         category:    form.category || null,
       })
@@ -110,7 +190,7 @@ export default function HelpdeskPortal() {
 
           <div className="flex gap-3 justify-center">
             <button
-              onClick={() => { setStep(1); setForm({ name:'',email:'',department:'',subject:'',description:'',priority:'Medium',category:'',attachment_note:'' }); setCreatedTicket(null) }}
+              onClick={() => { setStep(1); setForm({ name:'',email:'',department:'',subject:'',description:'',priority:'Medium',category:'',issue_type:'',attachment_note:'' }); setCreatedTicket(null) }}
               className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors"
             >
               Raise Another Ticket
@@ -271,7 +351,7 @@ export default function HelpdeskPortal() {
                   </label>
                   <select
                     value={form.category}
-                    onChange={e => set('category', e.target.value)}
+                    onChange={e => { set('category', e.target.value); set('issue_type', '') }}
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   >
                     <option value="">Select category</option>
@@ -289,6 +369,25 @@ export default function HelpdeskPortal() {
                   </select>
                 </div>
               </div>
+
+              {/* Issue Type — dynamic based on selected category */}
+              {form.category && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Issue Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={form.issue_type}
+                    onChange={e => set('issue_type', e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  >
+                    <option value="">Select issue type</option>
+                    {(ISSUE_CATALOG[form.category] || []).map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              )
 
               {/* Priority hint */}
               {form.priority && (
@@ -355,6 +454,7 @@ export default function HelpdeskPortal() {
                 <div className="border-t border-gray-200 my-2" />
                 <ReviewRow label="Subject"     value={form.subject} />
                 <ReviewRow label="Category"    value={form.category} />
+                {form.issue_type && <ReviewRow label="Issue Type" value={form.issue_type} />}
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500 font-medium">Priority</span>
                   <span className={`text-xs font-bold px-3 py-1 rounded-full border ${PRIORITY_INFO[form.priority]?.color}`}>

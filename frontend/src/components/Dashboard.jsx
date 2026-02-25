@@ -1,200 +1,298 @@
 import { useState, useEffect } from 'react'
-import { getDashboardStats, getAllTickets } from '../services/api'
-import { PieChart, Pie, BarChart, Bar, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import './Dashboard.css'
+import { getDashboardStats, getAllTickets, updateTicketStatus } from '../services/api'
+import {
+  PieChart, Pie, BarChart, Bar, Cell,
+  XAxis, YAxis, Tooltip, Legend, ResponsiveContainer
+} from 'recharts'
 
-const COLORS = ['#1e3a5f', '#3f51b5', '#5c6bc0', '#9fa8da']
+const PIE_COLORS  = ['#4f46e5', '#5a67d8', '#818cf8', '#c7d2fe']
+const BAR_COLORS  = { Priority: '#4f46e5', Status: '#5c6bc0', Category: '#818cf8' }
+const STATUSES    = ['Open', 'Pending', 'Resolved', 'Closed']
 
-function Dashboard({ onBack }) {
-  const [stats, setStats] = useState(null)
-  const [tickets, setTickets] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+const PRIORITY_BADGE = {
+  High:   'bg-red-100 text-red-700',
+  Medium: 'bg-yellow-100 text-yellow-800',
+  Low:    'bg-green-100 text-green-700',
+}
+const STATUS_BADGE = {
+  Open:     'bg-blue-100 text-blue-800',
+  Pending:  'bg-yellow-100 text-yellow-800',
+  Resolved: 'bg-green-100 text-green-700',
+  Closed:   'bg-gray-100 text-gray-600',
+}
 
-  useEffect(() => {
-    loadDashboard()
-  }, [])
+function Badge({ label, palette }) {
+  const cls = palette?.[label] || 'bg-gray-100 text-gray-600'
+  return (
+    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${cls}`}>
+      {label}
+    </span>
+  )
+}
 
-  const loadDashboard = async () => {
-    setError(null)
+function KpiCard({ label, value, accent }) {
+  return (
+    <div className={`bg-white rounded-xl shadow-sm border-l-4 ${accent} p-5 flex flex-col gap-1`}>
+      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{label}</span>
+      <span className="text-3xl font-bold text-gray-800">{value}</span>
+    </div>
+  )
+}
+
+function StatusDropdown({ ticket, onChange }) {
+  const [loading, setLoading] = useState(false)
+
+  const handle = async (e) => {
+    const newStatus = e.target.value
+    setLoading(true)
     try {
-      const [statsData, ticketsData] = await Promise.all([
-        getDashboardStats(),
-        getAllTickets()
-      ])
-      setStats(statsData)
-      setTickets(ticketsData)
+      await updateTicketStatus(ticket.id, newStatus)
+      onChange(ticket.id, newStatus)
     } catch (err) {
-      console.error('Failed to load dashboard:', err)
-      const msg = err?.response?.data?.detail || err?.message || String(err)
-      const isNetwork = err?.code === 'ERR_NETWORK' || err?.message?.includes('Network')
-      setError({
-        message: msg,
-        hint: isNetwork ? 'Make sure the FastAPI backend is running: python backend/api.py' : null
-      })
+      alert('Failed to update status: ' + (err?.response?.data?.detail || err.message))
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading) {
-    return <div className="dashboard-loading">Loading dashboard...</div>
+  return (
+    <select
+      value={ticket.status}
+      onChange={handle}
+      disabled={loading}
+      className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 cursor-pointer"
+    >
+      {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+    </select>
+  )
+}
+
+export default function Dashboard({ onBack }) {
+  const [stats, setStats]     = useState(null)
+  const [tickets, setTickets] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError]     = useState(null)
+  const [search, setSearch]   = useState('')
+  const [filterPriority, setFilterPriority] = useState('')
+  const [filterStatus, setFilterStatus]     = useState('')
+
+  useEffect(() => { loadDashboard() }, [])
+
+  const loadDashboard = async () => {
+    setError(null)
+    setLoading(true)
+    try {
+      const [s, t] = await Promise.all([getDashboardStats(), getAllTickets()])
+      setStats(s)
+      setTickets(t)
+    } catch (err) {
+      const msg = err?.response?.data?.detail || err?.message || String(err)
+      const hint = (err?.code === 'ERR_NETWORK' || err?.message?.includes('Network'))
+        ? 'Make sure the FastAPI backend is running: python backend/api.py'
+        : null
+      setError({ message: msg, hint })
+    } finally {
+      setLoading(false)
+    }
   }
 
-  if (!stats) {
+  const handleStatusChange = (ticketId, newStatus) => {
+    setTickets(prev => prev.map(t => t.id === ticketId ? { ...t, status: newStatus } : t))
+  }
+
+  if (loading) {
     return (
-      <div className="dashboard-error">
-        <h3>Failed to load dashboard data</h3>
-        {error && (
-          <>
-            <p className="error-detail">{error.message}</p>
-            {error.hint && <p className="error-hint">{error.hint}</p>}
-            {!error.hint && <p className="error-hint">Check browser console (F12) for details.</p>}
-          </>
-        )}
-        <button className="retry-btn" onClick={() => { setLoading(true); loadDashboard(); }}>
-          Retry
-        </button>
-        <button className="back-btn" onClick={onBack} style={{ marginLeft: 8 }}>
-          ← Back to chat
-        </button>
+      <div className="flex items-center justify-center h-64">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+          <span className="text-gray-500 text-sm">Loading dashboard…</span>
+        </div>
       </div>
     )
   }
 
-  const priorityData = Object.entries(stats.by_priority).map(([key, value]) => ({
-    name: key,
-    value: value
-  }))
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="bg-white rounded-xl shadow p-8 text-center max-w-md">
+          <div className="text-4xl mb-3">⚠️</div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Failed to load dashboard</h3>
+          <p className="text-sm text-red-500 mb-1">{error.message}</p>
+          {error.hint && <p className="text-xs text-gray-400 mb-4">{error.hint}</p>}
+          <div className="flex gap-2 justify-center">
+            <button onClick={loadDashboard} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">
+              Retry
+            </button>
+            <button onClick={onBack} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">
+              ← Back
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-  const statusData = Object.entries(stats.by_status).map(([key, value]) => ({
-    name: key,
-    value: value
-  })).filter(item => item.value > 0)
+  const priorityData  = Object.entries(stats.by_priority).map(([name, value]) => ({ name, value }))
+  const statusData    = Object.entries(stats.by_status).filter(([, v]) => v > 0).map(([name, value]) => ({ name, value }))
+  const categoryData  = Object.entries(stats.by_category).filter(([, v]) => v > 0).map(([name, value]) => ({ name, value }))
 
-  const categoryData = Object.entries(stats.by_category).map(([key, value]) => ({
-    name: key,
-    value: value
-  })).filter(item => item.value > 0)
+  const filtered = tickets.filter(t => {
+    const q = search.toLowerCase()
+    const matchSearch = !q || t.id.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q)
+    const matchP = !filterPriority || t.priority === filterPriority
+    const matchS = !filterStatus  || t.status === filterStatus
+    return matchSearch && matchP && matchS
+  })
+
+  const kpis = [
+    { label: 'Overdue',         value: stats.overdue,     accent: 'border-red-500' },
+    { label: 'Due Today',       value: stats.due_today,   accent: 'border-orange-400' },
+    { label: 'Open',            value: stats.open,        accent: 'border-blue-500' },
+    { label: 'On Hold',         value: stats.on_hold,     accent: 'border-yellow-400' },
+    { label: 'Unassigned',      value: stats.unassigned,  accent: 'border-purple-400' },
+    { label: 'Total Tickets',   value: stats.all,         accent: 'border-indigo-500' },
+  ]
 
   return (
-    <div className="dashboard">
-      <div className="dashboard-header">
-        <h1>Helpdesk Ticket Management System Dashboard</h1>
-        <p className="dashboard-subtitle">
-          This dashboard illustrates facts and figures related to ticket management.
-          It includes overdue tasks, tickets due today, open tickets, tickets on hold, unassigned tickets, and more.
-        </p>
+    <div className="p-6 space-y-6 overflow-y-auto h-full bg-gray-50">
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Helpdesk Ticket Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Ticket analytics and management in real time</p>
+        </div>
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 shadow-sm"
+        >
+          ← Back to Chat
+        </button>
       </div>
 
-      <div className="kpi-cards">
-        <div className="kpi-card">
-          <div className="kpi-header">Overdue Tasks</div>
-          <div className="kpi-value">{stats.overdue}</div>
-        </div>
-        <div className="kpi-card">
-          <div className="kpi-header">Tickets Due Today</div>
-          <div className="kpi-value">{stats.due_today}</div>
-        </div>
-        <div className="kpi-card">
-          <div className="kpi-header">Open Tickets</div>
-          <div className="kpi-value">{stats.open}</div>
-        </div>
-        <div className="kpi-card">
-          <div className="kpi-header">Tickets on Hold</div>
-          <div className="kpi-value">{stats.on_hold}</div>
-        </div>
-        <div className="kpi-card">
-          <div className="kpi-header">Unassigned Tickets</div>
-          <div className="kpi-value">{stats.unassigned}</div>
-        </div>
-        <div className="kpi-card">
-          <div className="kpi-header">All Tickets</div>
-          <div className="kpi-value">{stats.all}</div>
-        </div>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
 
-      <div className="charts-row">
-        <div className="chart-panel">
-          <div className="chart-header">Unresolved Tickets by Priority</div>
-          <div className="chart-body">
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={priorityData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {priorityData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <h3 className="text-sm font-semibold text-gray-600 mb-3">By Priority</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <PieChart>
+              <Pie data={priorityData} cx="50%" cy="50%" innerRadius={55} outerRadius={80} paddingAngle={4} dataKey="value">
+                {priorityData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
 
-        <div className="chart-panel">
-          <div className="chart-header">Unresolved Tickets by Status</div>
-          <div className="chart-body">
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={statusData} layout="vertical">
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={80} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#3f51b5" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <h3 className="text-sm font-semibold text-gray-600 mb-3">By Status</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={statusData} layout="vertical" margin={{ left: 10 }}>
+              <XAxis type="number" tick={{ fontSize: 11 }} />
+              <YAxis dataKey="name" type="category" width={70} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="value" fill={BAR_COLORS.Status} radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
 
-        <div className="chart-panel">
-          <div className="chart-header">New & Open Tickets Category-wise</div>
-          <div className="chart-body">
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={categoryData} layout="vertical">
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={80} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#5c6bc0" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <h3 className="text-sm font-semibold text-gray-600 mb-3">By Category</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={categoryData} layout="vertical" margin={{ left: 10 }}>
+              <XAxis type="number" tick={{ fontSize: 11 }} />
+              <YAxis dataKey="name" type="category" width={70} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="value" fill={BAR_COLORS.Category} radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
-      <hr className="divider" />
+      {/* Ticket List */}
+      <div className="bg-white rounded-xl shadow-sm">
+        <div className="px-5 py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center gap-3">
+          <h2 className="text-base font-semibold text-gray-800 flex-1">All Tickets ({filtered.length})</h2>
 
-      <h2 className="tickets-title">Ticket List</h2>
-      {tickets.length === 0 ? (
-        <p className="no-tickets">No tickets have been raised yet.</p>
-      ) : (
-        <div className="tickets-list">
-          {tickets.map((ticket) => (
-            <details key={ticket.id} className="ticket-item">
-              <summary>
-                <strong>{ticket.id}</strong> — {ticket.subject} ({ticket.priority})
-              </summary>
-              <div className="ticket-details">
-                <p><strong>Subject:</strong> {ticket.subject}</p>
-                <p><strong>Description:</strong> {ticket.description}</p>
-                <p><strong>Priority:</strong> {ticket.priority} | <strong>Status:</strong> {ticket.status}</p>
-                <p className="ticket-date">Created: {new Date(ticket.created_at).toLocaleString()}</p>
-              </div>
-            </details>
-          ))}
+          {/* Search */}
+          <input
+            type="text"
+            placeholder="Search by ID or subject…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 w-full md:w-52"
+          />
+
+          {/* Priority filter */}
+          <select
+            value={filterPriority}
+            onChange={e => setFilterPriority(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          >
+            <option value="">All Priorities</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+
+          {/* Status filter */}
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          >
+            <option value="">All Statuses</option>
+            {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
         </div>
-      )}
 
-      <button className="back-btn" onClick={onBack}>← Back to chat</button>
+        {filtered.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-10">No tickets found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+                  <th className="px-5 py-3 text-left font-semibold">ID</th>
+                  <th className="px-5 py-3 text-left font-semibold">Subject</th>
+                  <th className="px-5 py-3 text-left font-semibold">Category</th>
+                  <th className="px-5 py-3 text-left font-semibold">Priority</th>
+                  <th className="px-5 py-3 text-left font-semibold">Status</th>
+                  <th className="px-5 py-3 text-left font-semibold">Created</th>
+                  <th className="px-5 py-3 text-left font-semibold">Update Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filtered.map(ticket => (
+                  <tr key={ticket.id} className="hover:bg-indigo-50/40 transition-colors">
+                    <td className="px-5 py-3 font-mono text-indigo-600 font-semibold">{ticket.id}</td>
+                    <td className="px-5 py-3 text-gray-700 max-w-xs truncate" title={ticket.subject}>{ticket.subject}</td>
+                    <td className="px-5 py-3 text-gray-500">{ticket.category || '—'}</td>
+                    <td className="px-5 py-3">
+                      <Badge label={ticket.priority} palette={PRIORITY_BADGE} />
+                    </td>
+                    <td className="px-5 py-3">
+                      <Badge label={ticket.status} palette={STATUS_BADGE} />
+                    </td>
+                    <td className="px-5 py-3 text-gray-400 whitespace-nowrap">
+                      {new Date(ticket.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-5 py-3">
+                      <StatusDropdown ticket={ticket} onChange={handleStatusChange} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
-
-export default Dashboard

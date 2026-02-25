@@ -39,6 +39,11 @@ export const getAllTickets = async () => {
   return response.data;
 };
 
+export const updateTicketStatus = async (ticketId, status) => {
+  const response = await api.patch(`/tickets/${ticketId}/status`, { status });
+  return response.data;
+};
+
 // Dashboard API
 export const getDashboardStats = async () => {
   const response = await api.get('/dashboard/stats');

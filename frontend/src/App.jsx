@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import Chat from './components/Chat'
@@ -17,6 +17,16 @@ function ChatApp() {
   const [showTicketForm, setShowTicketForm] = useState(false)
   const [messages, setMessages] = useState([])
   const [sessionId, setSessionId] = useState(() => generateSessionId())
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('appTheme')
+    return saved !== 'light'
+  })
+
+  const toggleTheme = () => setDarkMode(d => {
+    const next = !d
+    localStorage.setItem('appTheme', next ? 'dark' : 'light')
+    return next
+  })
 
   const handleNewChat = useCallback(() => {
     setMessages([])
@@ -36,8 +46,8 @@ function ChatApp() {
   }
 
   return (
-    <div className="app">
-      <Header onDashboardClick={handleDashboardToggle} />
+    <div className={`app${darkMode ? '' : ' light-mode'}`}>
+      <Header onDashboardClick={handleDashboardToggle} darkMode={darkMode} onToggleTheme={toggleTheme} />
       <div className="app-container">
         <Sidebar
           messages={messages}
@@ -67,8 +77,10 @@ function ChatApp() {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<ChatApp />} />
-      <Route path="/helpdesk" element={<HelpdeskPortal />} />
+      <Route path="/"          element={<HelpdeskPortal />} />
+      <Route path="/userhelpdesk"  element={<HelpdeskPortal />} />
+      <Route path="/dashboard" element={<ChatApp />} />
+      <Route path="*"          element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

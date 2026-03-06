@@ -4,8 +4,9 @@ Uses SQLAlchemy ORM for ticket management (PostgreSQL) with JSON fallback.
 """
 from contextlib import asynccontextmanager
 from datetime import datetime
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import List, Optional
 import sys
@@ -85,6 +86,7 @@ class TicketRequest(BaseModel):
     description: str
     priority: str = "Medium"
     category: Optional[str] = None
+    ticket_type: Optional[str] = "incident"  # incident | service_request
 
 class TicketStatusUpdate(BaseModel):
     status: str  # Open | Pending | Resolved | Closed
@@ -98,6 +100,32 @@ class TicketResponse(BaseModel):
     created_at: str
     category: Optional[str] = None
     assigned_to: Optional[str] = None
+
+# ── Auth models ──────────────────────────────────────────────────────────────
+class RegisterRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+    emp_id: Optional[str] = None
+    role: str = "user"  # user | admin
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class AuthResponse(BaseModel):
+    token: str
+    user: dict
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    emp_id: Optional[str] = None
+    role: str
+    created_at: str
+
+# ─────────────────────────────────────────────────────────────────────────────
 
 class DashboardStats(BaseModel):
     overdue: int
@@ -384,6 +412,59 @@ async def create_helpdesk_ticket(ticket: TicketRequest, background_tasks: Backgr
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/api/my-tickets", response_model=List[TicketResponse])
+async def get_my_tickets(email: str, ticket_type: Optional[str] = None):
+    """
+    Fetch tickets for a specific user by email.
+    Searches description for the email tag [Raised by: ... <email>].
+    Optionally filter by ticket_type: incident | service_request.
+    """
+    try:
+        from backend.db_orm import orm_available
+        if orm_available():
+            tickets = _orm_list_all_tickets()
+        else:
+            from tickets import get_all_tickets
+            tickets = get_all_tickets()
+
+        results = []
+        for t in tickets:
+            desc = t.get("description", "")
+            if email.lower() in desc.lower():
+                if ticket_type:
+                    type_tag = f"[TYPE: {ticket_type}]"
+                    if type_tag not in desc:
+                        continue
+                results.append(t)
+        return [TicketResponse(**t) for t in results]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/tickets/track/{ticket_id}", response_model=TicketResponse)
+async def track_ticket(ticket_id: str):
+    """Track a specific ticket by its ID (e.g. TKT-1000)."""
+    try:
+        from backend.db_orm import orm_available, get_db
+        if orm_available():
+            from backend.models import Ticket
+            with get_db() as db:
+                t = db.query(Ticket).filter(Ticket.ticket_id == ticket_id.upper()).first()
+                if not t:
+                    raise HTTPException(status_code=404, detail=f"Ticket '{ticket_id}' not found")
+                return TicketResponse(**t.to_dict())
+        else:
+            from tickets import get_all_tickets
+            for t in get_all_tickets():
+                if t.get("id", "").upper() == ticket_id.upper():
+                    return TicketResponse(**t)
+            raise HTTPException(status_code=404, detail=f"Ticket '{ticket_id}' not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/config")
 async def get_config():
     return {
@@ -391,6 +472,103 @@ async def get_config():
         "notification_email": os.getenv("NOTIFICATION_EMAIL", ""),
         "use_database": os.getenv("USE_DATABASE", "false"),
     }
+
+
+# ── Auth helpers ──────────────────────────────────────────────────────────────
+_bearer = HTTPBearer(auto_error=False)
+
+def _get_current_user(credentials: HTTPAuthorizationCredentials = Depends(_bearer)):
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    from backend.auth import decode_token
+    payload = decode_token(credentials.credentials)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return payload  # {"sub": email, "role": role, "name": name, "id": id}
+
+
+# ── Auth endpoints ────────────────────────────────────────────────────────────
+@app.post("/api/auth/register", response_model=AuthResponse)
+async def register(body: RegisterRequest):
+    """Register a new user account."""
+    try:
+        from backend.db_orm import orm_available, get_db
+        from backend.auth import hash_password, create_token
+        from backend.models import User
+
+        if not orm_available():
+            raise HTTPException(status_code=503, detail="Database not available. Enable PostgreSQL first.")
+
+        with get_db() as db:
+            existing = db.query(User).filter(User.email == body.email.lower()).first()
+            if existing:
+                raise HTTPException(status_code=409, detail="Email already registered.")
+
+            user = User(
+                name=body.name.strip(),
+                email=body.email.strip().lower(),
+                emp_id=body.emp_id.strip() if body.emp_id else None,
+                password_hash=body.password,
+                role=body.role if body.role in ("user", "admin") else "user",
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+
+            token = create_token({"sub": user.email, "role": user.role, "name": user.name, "id": user.id})
+            return AuthResponse(token=token, user=user.to_dict())
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/auth/login", response_model=AuthResponse)
+async def login(body: LoginRequest):
+    """Login with email and password."""
+    try:
+        from backend.db_orm import orm_available, get_db
+        from backend.auth import verify_password, create_token
+        from backend.models import User
+
+        if not orm_available():
+            raise HTTPException(status_code=503, detail="Database not available.")
+
+        with get_db() as db:
+            user = db.query(User).filter(User.email == body.email.strip().lower()).first()
+            if not user or not verify_password(body.password, user.password_hash):
+                raise HTTPException(status_code=401, detail="Invalid email or password.")
+
+            token = create_token({"sub": user.email, "role": user.role, "name": user.name, "id": user.id})
+            return AuthResponse(token=token, user=user.to_dict())
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/auth/me", response_model=UserResponse)
+async def get_me(current_user: dict = Depends(_get_current_user)):
+    """Get the currently authenticated user's profile."""
+    try:
+        from backend.db_orm import orm_available, get_db
+        from backend.models import User
+
+        if not orm_available():
+            raise HTTPException(status_code=503, detail="Database not available.")
+
+        with get_db() as db:
+            user = db.query(User).filter(User.email == current_user["sub"]).first()
+            if not user:
+                raise HTTPException(status_code=404, detail="User not found.")
+            return UserResponse(**user.to_dict())
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

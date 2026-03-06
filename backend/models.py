@@ -45,6 +45,28 @@ class Ticket(Base):
         }
 
 
+class User(Base):
+    __tablename__ = "users"
+
+    id         = Column(Integer, primary_key=True, autoincrement=True)
+    name       = Column(String(200), nullable=False)
+    email      = Column(String(200), unique=True, nullable=False, index=True)
+    emp_id     = Column(String(50), nullable=True)
+    password_hash = Column(String(255), nullable=False)
+    role       = Column(String(20), default="user", nullable=False)  # user | admin
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    def to_dict(self) -> dict:
+        return {
+            "id":         self.id,
+            "name":       self.name,
+            "email":      self.email,
+            "emp_id":     self.emp_id,
+            "role":       self.role,
+            "created_at": self.created_at.isoformat() if self.created_at else "",
+        }
+
+
 class ChatHistory(Base):
     __tablename__ = "chat_history"
 

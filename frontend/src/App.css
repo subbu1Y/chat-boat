@@ -24,55 +24,74 @@
 /* Sidebar Styles */
 .sidebar {
   width: 280px;
-  background-color: rgb(32, 33, 35);
-  color: #ECECF1;
+  background: linear-gradient(180deg, #5a67d8 0%, #6b46c1 100%);
+  color: #ffffff;
   padding: 1rem;
   overflow-y: auto;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 4px 0 18px rgba(90, 103, 216, 0.25);
 }
 
 .sidebar button {
   width: 100%;
   padding: 10px 14px;
-  background-color: rgb(52, 53, 65);
-  color: #ECECF1;
-  border: none;
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 8px;
   font-size: 15px;
   cursor: pointer;
   margin-bottom: 8px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .sidebar button:hover {
-  background-color: rgb(42, 43, 45);
+  background-color: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.45);
 }
 
 .sidebar hr {
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   margin: 1rem 0;
 }
 
 .sidebar h3 {
   font-size: 1rem;
-  color: #CCCCCC;
+  color: #ffffff;
   margin: 20px 0 8px 0;
+  font-weight: 600;
 }
 
 .sidebar .caption {
   font-size: 0.95rem;
-  color: #9B9B9B;
+  color: rgba(255, 255, 255, 0.75);
   margin-bottom: 8px;
 }
 
 .sidebar .message-preview {
   font-size: 0.95rem;
-  color: #ECECF1;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ── Light Mode Overrides ── */
+.light-mode {
+  background-color: #F0F4FF;
+}
+
+/* Sidebar keeps the Cognida blue gradient in both dark and light mode */
+.light-mode .sidebar {
+  background: linear-gradient(180deg, #5a67d8 0%, #6b46c1 100%);
+  color: #ffffff;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.light-mode .main-content {
+  background-color: #F0F4FF;
 }
 
 /* Responsive */

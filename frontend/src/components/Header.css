@@ -61,6 +61,33 @@
   box-shadow: 0 4px 12px rgba(90, 103, 216, 0.4);
 }
 
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Light mode — header keeps the Cognida blue gradient in both modes */
+.light-mode .header {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  color: white;
+  box-shadow: 0 4px 18px rgba(90, 103, 216, 0.28);
+}
+
 @media (max-width: 768px) {
   .header {
     padding: 0 1rem;

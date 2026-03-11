@@ -56,6 +56,12 @@ export const createHelpdeskTicket = async (ticketData) => {
   return response.data;
 };
 
+// Quick Incident — one-click minimal ticket
+export const createQuickTicket = async (data) => {
+  const response = await api.post('/helpdesk/quick-ticket', data);
+  return response.data;
+};
+
 // My tickets - search by email + type
 export const getMyTickets = async (email, ticket_type = null) => {
   const params = { email };

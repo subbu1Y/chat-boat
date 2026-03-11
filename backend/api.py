@@ -412,6 +412,80 @@ async def create_helpdesk_ticket(ticket: TicketRequest, background_tasks: Backgr
         raise HTTPException(status_code=500, detail=str(e))
 
 
+class QuickTicketRequest(BaseModel):
+    description: str
+    department: Optional[str] = ""
+    metadata: Optional[dict] = {}
+
+
+@app.post("/api/helpdesk/quick-ticket", response_model=TicketResponse)
+async def create_quick_ticket(
+    payload: QuickTicketRequest,
+    background_tasks: BackgroundTasks,
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+):
+    """
+    One-click Quick Incident endpoint.
+    Reads name/email from the JWT token, auto-generates subject and priority.
+    Stores device metadata in the description body.
+    """
+    from datetime import datetime as dt
+
+    # Extract user identity from JWT (optional – falls back gracefully if no token)
+    name  = "Anonymous"
+    email = "unknown@cognida.ai"
+    if credentials and credentials.credentials:
+        from backend.auth import decode_token
+        data = decode_token(credentials.credentials)
+        if data:
+            name  = data.get("name",  name)
+            email = data.get("email", email)
+
+    now     = dt.utcnow()
+    subject = f"Quick Incident – {now.strftime('%H:%M %d/%m/%Y')} UTC"
+
+    meta   = payload.metadata or {}
+    dept   = payload.department or "—"
+    device = meta.get("device", "Unknown device")
+    browser= meta.get("browser", "Unknown browser")
+    os_val = meta.get("os", "Unknown OS")
+    ts     = meta.get("submitted_at", now.isoformat())
+    url    = meta.get("url", "")
+    # Allow name/email override from metadata when user is not authenticated via JWT
+    if meta.get("name"):  name  = meta["name"]
+    if meta.get("email"): email = meta["email"]
+
+    full_description = (
+        f"{payload.description}\n\n"
+        f"---\n"
+        f"[Quick Incident] Raised by: {name} <{email}>\n"
+        f"Department: {dept}\n"
+        f"Device: {device} | OS: {os_val} | Browser: {browser}\n"
+        f"Submitted at: {ts}\n"
+        f"URL: {url}\n"
+        f"[TYPE: incident]"
+    )
+
+    try:
+        from backend.db_orm import orm_available
+        if orm_available():
+            new_ticket = _orm_create_ticket(
+                subject, full_description, "High", "Other"
+            )
+        else:
+            from tickets import create_ticket
+            new_ticket = create_ticket(
+                subject=subject,
+                description=full_description,
+                priority="High",
+                category="Other",
+            )
+        background_tasks.add_task(send_ticket_notification, new_ticket)
+        return TicketResponse(**new_ticket)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/my-tickets", response_model=List[TicketResponse])
 async def get_my_tickets(email: str, ticket_type: Optional[str] = None):
     """

@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback } from 'react'
-import { createHelpdeskTicket, getMyTickets, trackTicket } from '../services/api'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { createHelpdeskTicket, getMyTickets, trackTicket, createQuickTicket } from '../services/api'
+import { useAuth } from '../context/AuthContext'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -64,12 +65,20 @@ const DARK = {
   page:         '#060E35',
   sidebar:      '#0B1854',
   sideBorder:   '#1E3799',
-  topbar:       '#0B1854',
+  topbar:       'linear-gradient(135deg, #0B1854 0%, #1E3799 100%)',
+  topbarText:   '#E8EEFF',
+  topbarMuted:  '#7EA6FF',
   text:         '#E8EEFF',
   muted:        '#7EA6FF',
   dim:          '#3B5299',
   accent:       '#4361EE',
   navHover:     '#0F1F6B',
+  sideText:     '#E8EEFF',
+  sideMuted:    '#7EA6FF',
+  sideDim:      '#3B5299',
+  sideAccent:   '#4361EE',
+  sideNavHover: '#0F1F6B',
+  sideFooter:   '#3B5299',
   card:         '#0B1A5C',
   cardBorder:   '#1E3799',
   label:        '#C7D7FF',
@@ -101,14 +110,22 @@ const DARK = {
 
 const LIGHT = {
   page:         '#F0F4FF',
-  sidebar:      '#FFFFFF',
-  sideBorder:   '#E2E8F0',
-  topbar:       '#FFFFFF',
+  sidebar:      'linear-gradient(180deg, #5a67d8 0%, #6b46c1 100%)',
+  sideBorder:   'rgba(255,255,255,0.15)',
+  topbar:       'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
+  topbarText:   '#FFFFFF',
+  topbarMuted:  'rgba(255,255,255,0.75)',
   text:         '#1E293B',
   muted:        '#4361EE',
   dim:          '#64748B',
   accent:       '#4361EE',
   navHover:     '#EEF2FF',
+  sideText:     '#FFFFFF',
+  sideMuted:    'rgba(255,255,255,0.8)',
+  sideDim:      'rgba(255,255,255,0.65)',
+  sideAccent:   'rgba(255,255,255,0.22)',
+  sideNavHover: 'rgba(255,255,255,0.12)',
+  sideFooter:   'rgba(255,255,255,0.5)',
   card:         '#FFFFFF',
   cardBorder:   '#E2E8F0',
   label:        '#374151',
@@ -133,9 +150,9 @@ const LIGHT = {
   dragBg:       '#FFFFFF',
   trackBg:      '#EEF2FF',
   trackBorder:  '#C7D7FF',
-  toggleBg:     '#EEF2FF',
-  toggleBorder: '#C7D7FF',
-  toggleText:   '#4361EE',
+  toggleBg:     'rgba(255,255,255,0.18)',
+  toggleBorder: 'rgba(255,255,255,0.35)',
+  toggleText:   '#ffffff',
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -227,10 +244,10 @@ function TicketForm({ ticketType, catalog, onSuccess, C }) {
   const categories = Object.keys(catalog)
 
   return (
-    <div className="p-6">
+    <div className="p-4">
       {/* Step indicator */}
-      <div className="w-full mb-6">
-        <div className="flex items-center rounded-2xl px-8 py-4" style={{background: C.stepBg}}>
+      <div className="w-full mb-4">
+        <div className="flex items-center rounded-xl px-6 py-3" style={{background: C.stepBg}}>
           <StepBadge n={1} active={step===1} done={step>1} />
           <StepLine done={step>1} />
           <StepBadge n={2} active={step===2} done={step>2} />
@@ -248,90 +265,90 @@ function TicketForm({ ticketType, catalog, onSuccess, C }) {
 
         {/* Step 1 */}
         {step === 1 && (
-          <div className="p-10 space-y-8">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">👤</span>
-              <h3 style={{color: C.text}} className="text-2xl font-bold">Your Details</h3>
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xl">👤</span>
+              <h3 style={{color: C.text}} className="text-lg font-bold">Your Details</h3>
             </div>
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label style={{color: C.label}} className="block text-base font-semibold mb-2">Full Name <span className="text-red-500">*</span></label>
+                <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Full Name <span className="text-red-500">*</span></label>
                 <input type="text" value={form.name} onChange={e=>set('name',e.target.value)} placeholder="e.g. Subrahmanyam P"
-                  style={IS} className="w-full border rounded-xl px-5 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                  style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
               </div>
               <div>
-                <label style={{color: C.label}} className="block text-base font-semibold mb-2">Work Email <span className="text-red-500">*</span></label>
+                <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Work Email <span className="text-red-500">*</span></label>
                 <input type="email" value={form.email} onChange={e=>set('email',e.target.value)} placeholder="you@cognida.ai"
-                  style={IS} className="w-full border rounded-xl px-5 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                  style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
               </div>
             </div>
             <div>
-              <label style={{color: C.label}} className="block text-base font-semibold mb-2">Department <span className="font-normal text-sm" style={{color: C.dim}}>(optional)</span></label>
+              <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Department <span className="font-normal text-xs" style={{color: C.dim}}>(optional)</span></label>
               <input type="text" value={form.department} onChange={e=>set('department',e.target.value)} placeholder="e.g. Engineering, QA, Sales"
-                style={IS} className="w-full border rounded-xl px-5 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
             </div>
             {error && <ErrorBox msg={error} />}
             <div className="flex justify-end">
-              <button onClick={()=>{if(v1())nextStep()}} className="px-10 py-3.5 bg-indigo-600 text-white rounded-xl text-base font-semibold hover:bg-indigo-700 transition-colors">Next →</button>
+              <button onClick={()=>{if(v1())nextStep()}} className="px-7 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">Next →</button>
             </div>
           </div>
         )}
 
         {/* Step 2 */}
         {step === 2 && (
-          <div className="p-10 space-y-8">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">{ticketType === 'incident' ? '🚨' : '🔧'}</span>
-              <h3 style={{color: C.text}} className="text-2xl font-bold">Issue Details</h3>
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xl">{ticketType === 'incident' ? '🚨' : '🔧'}</span>
+              <h3 style={{color: C.text}} className="text-lg font-bold">Issue Details</h3>
             </div>
             <div>
-              <label style={{color: C.label}} className="block text-base font-semibold mb-2">Subject <span className="text-red-500">*</span></label>
+              <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Subject <span className="text-red-500">*</span></label>
               <input type="text" value={form.subject} onChange={e=>set('subject',e.target.value)} placeholder="Brief summary of the issue"
-                style={IS} className="w-full border rounded-xl px-5 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
             </div>
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label style={{color: C.label}} className="block text-base font-semibold mb-2">Category <span className="text-red-500">*</span></label>
+                <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Category <span className="text-red-500">*</span></label>
                 <select value={form.category} onChange={e=>{set('category',e.target.value);set('issue_type','')}}
-                  style={IS} className="w-full border rounded-xl px-5 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                  style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
                   <option value="">Select category</option>
                   {categories.map(c=><option key={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label style={{color: C.label}} className="block text-base font-semibold mb-2">Priority</label>
+                <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Priority</label>
                 <select value={form.priority} onChange={e=>set('priority',e.target.value)}
-                  style={IS} className="w-full border rounded-xl px-5 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                  style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
                   {PRIORITIES.map(p=><option key={p}>{p}</option>)}
                 </select>
               </div>
             </div>
             {form.category && (
               <div>
-                <label style={{color: C.label}} className="block text-base font-semibold mb-2">Issue Type <span className="text-red-500">*</span></label>
+                <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Issue Type <span className="text-red-500">*</span></label>
                 <select value={form.issue_type} onChange={e=>set('issue_type',e.target.value)}
-                  style={IS} className="w-full border rounded-xl px-5 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                  style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
                   <option value="">Select issue type</option>
                   {(catalog[form.category]||[]).map(t=><option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
             )}
             {form.priority && (
-              <div className={`flex items-center gap-3 rounded-xl p-4 border text-base ${PRIORITY_INFO[form.priority]?.color}`}>
-                <span className="text-xl">{PRIORITY_INFO[form.priority]?.icon}</span>
+              <div className={`flex items-center gap-2 rounded-lg px-4 py-2.5 border text-sm ${PRIORITY_INFO[form.priority]?.color}`}>
+                <span className="text-base">{PRIORITY_INFO[form.priority]?.icon}</span>
                 <span>{PRIORITY_INFO[form.priority]?.desc}</span>
               </div>
             )}
             <div>
-              <label style={{color: C.label}} className="block text-base font-semibold mb-2">Description <span className="text-red-500">*</span></label>
-              <textarea value={form.description} onChange={e=>set('description',e.target.value)} rows={5}
+              <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Description <span className="text-red-500">*</span></label>
+              <textarea value={form.description} onChange={e=>set('description',e.target.value)} rows={4}
                 placeholder="Describe in detail — what happened, when, any error messages…"
-                style={IS} className="w-full border rounded-xl px-5 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none" />
+                style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none" />
             </div>
             {/* Screenshot upload */}
             <div>
-              <label style={{color: C.label}} className="block text-base font-semibold mb-2">
-                Screenshots <span className="font-normal text-sm" style={{color: C.dim}}>(optional · max 5 · 5MB each)</span>
+              <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">
+                Screenshots <span className="font-normal text-xs" style={{color: C.dim}}>(optional · max 5 · 5MB each)</span>
               </label>
               <div onDrop={e=>{e.preventDefault();setDragOver(false);addFiles(e.dataTransfer.files)}}
                 onDragOver={e=>{e.preventDefault();setDragOver(true)}} onDragLeave={()=>setDragOver(false)}
@@ -340,20 +357,20 @@ function TicketForm({ ticketType, catalog, onSuccess, C }) {
                   background: dragOver ? 'rgba(99,102,241,0.08)' : C.dragBg,
                   borderColor: dragOver ? '#6366F1' : C.dragBorder,
                 }}
-                className="border-2 border-dashed rounded-xl px-6 py-7 text-center cursor-pointer transition-all hover:border-indigo-400">
+                className="border-2 border-dashed rounded-lg px-4 py-4 text-center cursor-pointer transition-all hover:border-indigo-400">
                 <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={e=>addFiles(e.target.files)} />
-                <svg className="w-9 h-9 text-gray-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-7 h-7 text-gray-300 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <p style={{color: C.dim}} className="text-base"><span className="text-indigo-500 font-semibold">Click</span> or drag &amp; drop screenshots</p>
+                <p style={{color: C.dim}} className="text-sm"><span className="text-indigo-500 font-semibold">Click</span> or drag &amp; drop screenshots</p>
               </div>
               {screenshots.length > 0 && (
-                <div className="mt-4 grid grid-cols-5 gap-3">
+                <div className="mt-3 grid grid-cols-5 gap-2">
                   {screenshots.map((s,i)=>(
                     <div key={i} className="relative group rounded-lg overflow-hidden border border-gray-200">
-                      <img src={s.preview} alt={s.name} className="w-full h-20 object-cover" />
+                      <img src={s.preview} alt={s.name} className="w-full h-16 object-cover" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button type="button" onClick={e=>{e.stopPropagation();removeShot(i)}} className="w-8 h-8 bg-red-500 text-white rounded-full text-sm hover:bg-red-600">✕</button>
+                        <button type="button" onClick={e=>{e.stopPropagation();removeShot(i)}} className="w-7 h-7 bg-red-500 text-white rounded-full text-xs hover:bg-red-600">✕</button>
                       </div>
                       <p style={{color: C.dim}} className="text-xs px-1 py-0.5 truncate">{s.name}</p>
                     </div>
@@ -363,20 +380,20 @@ function TicketForm({ ticketType, catalog, onSuccess, C }) {
             </div>
             {error && <ErrorBox msg={error} />}
             <div className="flex justify-between">
-              <button onClick={prevStep} style={{background: C.inputBg, color: C.text, borderColor: C.inputBorder}} className="px-8 py-3.5 border rounded-xl text-base font-semibold hover:opacity-80 transition-opacity">← Back</button>
-              <button onClick={()=>{if(v2())nextStep()}} className="px-10 py-3.5 bg-indigo-600 text-white rounded-xl text-base font-semibold hover:bg-indigo-700">Review →</button>
+              <button onClick={prevStep} style={{background: C.inputBg, color: C.text, borderColor: C.inputBorder}} className="px-6 py-2.5 border rounded-lg text-sm font-semibold hover:opacity-80 transition-opacity">← Back</button>
+              <button onClick={()=>{if(v2())nextStep()}} className="px-7 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">Review →</button>
             </div>
           </div>
         )}
 
         {/* Step 3 — Review */}
         {step === 3 && (
-          <div className="p-10 space-y-8">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">✅</span>
-              <h3 style={{color: C.text}} className="text-2xl font-bold">Review & Submit</h3>
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xl">✅</span>
+              <h3 style={{color: C.text}} className="text-lg font-bold">Review & Submit</h3>
             </div>
-            <div style={{background: C.rvBg, borderColor: C.rvBorder}} className="rounded-2xl p-6 space-y-4 text-base border">
+            <div style={{background: C.rvBg, borderColor: C.rvBorder}} className="rounded-xl p-4 space-y-3 text-sm border">
               <ReviewRow label="Name"        value={form.name} C={C} />
               <ReviewRow label="Email"       value={form.email} C={C} />
               {form.department && <ReviewRow label="Department" value={form.department} C={C} />}
@@ -414,8 +431,8 @@ function TicketForm({ ticketType, catalog, onSuccess, C }) {
             </div>
             {error && <ErrorBox msg={error} />}
             <div className="flex justify-between">
-              <button onClick={prevStep} disabled={loading} style={{background: C.inputBg, color: C.text, borderColor: C.inputBorder}} className="px-8 py-3.5 border rounded-xl text-base font-semibold hover:opacity-80 transition-opacity disabled:opacity-50">← Edit</button>
-              <button onClick={handleSubmit} disabled={loading} className="px-10 py-3.5 bg-indigo-600 text-white rounded-xl text-base font-semibold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2">
+              <button onClick={prevStep} disabled={loading} style={{background: C.inputBg, color: C.text, borderColor: C.inputBorder}} className="px-6 py-2.5 border rounded-lg text-sm font-semibold hover:opacity-80 transition-opacity disabled:opacity-50">← Edit</button>
+              <button onClick={handleSubmit} disabled={loading} className="px-7 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2">
                 {loading ? (<><svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>Submitting…</>) : '🎫 Submit'}
               </button>
             </div>
@@ -616,6 +633,184 @@ const NAV = [
   { id: 'my-service',       label: 'My Past Service Requests',    icon: '📂', desc: 'View your service requests' },
 ]
 
+// ─── QuickIncidentModal ───────────────────────────────────────────────────────
+function QuickIncidentModal({ onClose, C }) {
+  const auth = useAuth()
+  const user = auth?.user
+  const [name, setName]         = useState(user?.name  || '')
+  const [email, setEmail]       = useState(user?.email || '')
+  const [desc, setDesc]         = useState('')
+  const [loading, setLoading]   = useState(false)
+  const [error, setError]       = useState('')
+  const [ticket, setTicket]     = useState(null)
+
+  // Collect device metadata silently
+  const getMetadata = () => ({
+    device:       navigator.platform || 'Unknown',
+    browser:      navigator.userAgent.split(' ').slice(-1)[0] || 'Unknown',
+    os:           navigator.userAgent.match(/\(([^)]+)\)/)?.[1] || 'Unknown',
+    submitted_at: new Date().toISOString(),
+    url:          window.location.href,
+  })
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!name.trim())  { setError('Please enter your full name.'); return }
+    if (!email.trim() || !email.includes('@')) { setError('Please enter a valid work email.'); return }
+    if (!desc.trim())  { setError('Please describe the issue.'); return }
+    setError(''); setLoading(true)
+    try {
+      const meta = getMetadata()
+      meta.name  = name.trim()
+      meta.email = email.trim()
+      const result = await createQuickTicket({
+        description: desc.trim(),
+        department:  user?.department || '',
+        metadata:    meta,
+      })
+      setTicket(result)
+    } catch (err) {
+      setError(err?.response?.data?.detail || 'Failed to submit. Please try again.')
+    } finally { setLoading(false) }
+  }
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  const IS = { background: C.inputBg, borderColor: C.inputBorder, color: C.inputText }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className="w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden"
+        style={{ background: C.card, border: `1px solid ${C.cardBorder}` }}>
+
+        {/* Header */}
+        <div className="px-6 py-4 flex items-center justify-between"
+          style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚡</span>
+            <div>
+              <h2 className="text-lg font-bold text-white">Quick Incident</h2>
+              <p className="text-xs text-red-100">High priority — submitted instantly</p>
+            </div>
+          </div>
+          <button onClick={onClose}
+            className="text-white/70 hover:text-white text-2xl leading-none transition-colors">&times;</button>
+        </div>
+
+        {ticket ? (
+          /* ── Success state ── */
+          <div className="px-6 py-8 text-center">
+            <div className="text-5xl mb-4">✅</div>
+            <h3 className="text-xl font-bold mb-1" style={{ color: C.text }}>Ticket Raised!</h3>
+            <p className="text-sm mb-4" style={{ color: C.dim }}>Your incident has been logged and assigned.</p>
+            <div className="rounded-xl px-6 py-4 mb-6 inline-block"
+              style={{ background: C.inputBg, border: `1px solid ${C.inputBorder}` }}>
+              <p className="text-xs font-semibold mb-1" style={{ color: C.dim }}>TICKET ID</p>
+              <p className="text-2xl font-bold" style={{ color: C.accent !== 'rgba(255,255,255,0.22)' ? C.accent : '#4361EE' }}>
+                {ticket.id}
+              </p>
+            </div>
+            <p className="text-xs mb-6" style={{ color: C.dim }}>
+              Priority: <span className="font-semibold text-red-500">High</span> · Status: <span className="font-semibold">{ticket.status}</span>
+            </p>
+            <button onClick={onClose}
+              className="px-8 py-2.5 rounded-xl font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ background: '#4361EE' }}>
+              Close
+            </button>
+          </div>
+        ) : (
+          /* ── Form state ── */
+          <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+            {/* User info — read-only if logged in, editable if not */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold mb-1" style={{ color: C.label }}>
+                  Full Name {!user && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  readOnly={!!user}
+                  value={name}
+                  onChange={e => { if (!user) { setName(e.target.value); setError('') } }}
+                  placeholder={user ? '' : 'Your full name'}
+                  className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                  style={{ ...IS, opacity: user ? 0.7 : 1, cursor: user ? 'not-allowed' : 'text' }} />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1" style={{ color: C.label }}>
+                  Work Email {!user && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  readOnly={!!user}
+                  value={email}
+                  onChange={e => { if (!user) { setEmail(e.target.value); setError('') } }}
+                  placeholder={user ? '' : 'you@cognida.ai'}
+                  className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                  style={{ ...IS, opacity: user ? 0.7 : 1, cursor: user ? 'not-allowed' : 'text' }} />
+              </div>
+            </div>
+
+            {/* Issue description */}
+            <div>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: C.label }}>
+                Issue Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                autoFocus
+                rows={5}
+                value={desc}
+                onChange={e => { setDesc(e.target.value); setError('') }}
+                placeholder="Briefly describe what's happening… (e.g. 'Cannot connect to VPN since 9 AM')"
+                className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
+                style={IS}
+              />
+            </div>
+
+            {/* Metadata note */}
+            <p className="text-xs" style={{ color: C.dim }}>
+              📎 Device info &amp; timestamp will be attached automatically.
+            </p>
+
+            {error && (
+              <div className="rounded-xl px-4 py-3 text-sm text-red-500"
+                style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+                ⚠️ {error}
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-1">
+              <button type="button" onClick={onClose}
+                className="flex-1 py-2.5 rounded-xl font-semibold transition-opacity hover:opacity-80"
+                style={{ background: C.inputBg, border: `1px solid ${C.inputBorder}`, color: C.dim }}>
+                Cancel
+              </button>
+              <button type="submit" disabled={loading}
+                className="flex-1 py-2.5 rounded-xl font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
+                {loading
+                  ? <><svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                    </svg> Submitting…</>
+                  : '⚡ Submit Incident'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function ThemeToggle({ darkMode, onToggle, C }) {
   return (
     <button
@@ -663,6 +858,7 @@ export default function HelpdeskPortal() {
   const [view, setView]               = useState('incident')
   const [successData, setSuccessData] = useState(null)
   const [formKey, setFormKey]         = useState(0)
+  const [quickModal, setQuickModal]   = useState(false)
   const [darkMode, setDarkMode]       = useState(() => {
     const saved = localStorage.getItem('appTheme')
     return saved !== 'light'
@@ -704,17 +900,28 @@ export default function HelpdeskPortal() {
             <img src="/logo.png" alt="Cognida" className="h-12 w-auto"
               onError={e => { e.target.style.display='none' }} />
             <div className="text-center">
-              <h1 className="font-bold text-base leading-tight" style={{color: C.text}}>Cognida.ai</h1>
-              <p className="text-xs" style={{color: C.muted}}>IT Helpdesk Portal</p>
+              <h1 className="font-bold text-base leading-tight" style={{color: C.sideText}}>Cognida.ai</h1>
+              <p className="text-xs" style={{color: C.sideMuted}}>IT Helpdesk Portal</p>
             </div>
           </div>
           {/* Theme toggle in sidebar top-left area */}
           <div className="flex justify-center mb-2">
             <ThemeToggle darkMode={darkMode} onToggle={toggleTheme} C={C} />
           </div>
-          <p className="text-xs text-center leading-relaxed px-1" style={{color: C.dim}}>
+          <p className="text-xs text-center leading-relaxed px-1" style={{color: C.sideDim}}>
             Raise tickets, track incidents and service requests — all in one place.
           </p>
+        </div>
+
+        {/* ⚡ Quick Incident button */}
+        <div className="px-3 pb-2">
+          <button
+            onClick={() => setQuickModal(true)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90 active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', boxShadow: '0 4px 14px rgba(239,68,68,0.45)' }}
+          >
+            ⚡ Quick Incident
+          </button>
         </div>
 
         {/* Nav items */}
@@ -724,17 +931,17 @@ export default function HelpdeskPortal() {
               onClick={() => { setView(item.id); setSuccessData(null) }}
               className="w-full text-left px-3 py-3 rounded-xl transition-all focus:outline-none"
               style={view === item.id
-                ? {background: C.accent, boxShadow: '0 2px 8px rgba(67,97,238,0.4)'}
+                ? {background: C.sideAccent, boxShadow: '0 2px 8px rgba(0,0,0,0.2)'}
                 : {background: 'transparent'}
               }
-              onMouseEnter={e => { if(view!==item.id) e.currentTarget.style.background=C.navHover }}
+              onMouseEnter={e => { if(view!==item.id) e.currentTarget.style.background=C.sideNavHover }}
               onMouseLeave={e => { if(view!==item.id) e.currentTarget.style.background='transparent' }}
             >
               <div className="flex items-center gap-2.5">
                 <span className="text-lg flex-shrink-0">{item.icon}</span>
                 <div>
-                  <p className="text-sm font-semibold leading-tight" style={{color: view===item.id ? '#fff' : C.text}}>{item.label}</p>
-                  <p className="text-xs leading-tight mt-0.5" style={{color: view===item.id ? 'rgba(255,255,255,0.7)' : C.dim}}>{item.desc}</p>
+                  <p className="text-sm font-semibold leading-tight" style={{color: C.sideText}}>{item.label}</p>
+                  <p className="text-xs leading-tight mt-0.5" style={{color: C.sideDim}}>{item.desc}</p>
                 </div>
               </div>
             </button>
@@ -743,7 +950,7 @@ export default function HelpdeskPortal() {
 
         {/* Footer */}
         <div className="p-4" style={{borderTop: `1px solid ${C.sideBorder}`}}>
-          <p className="text-xs text-center" style={{color: C.footer}}>© 2026 Cognida.ai</p>
+          <p className="text-xs text-center" style={{color: C.sideFooter}}>© 2026 Cognida.ai</p>
         </div>
       </div>
 
@@ -753,11 +960,11 @@ export default function HelpdeskPortal() {
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 py-3 flex-shrink-0" style={{background: C.topbar, borderBottom: `1px solid ${C.sideBorder}`}}>
           <div>
-            <h2 className="text-base font-bold" style={{color: C.text}}>{activeNav?.icon} {activeNav?.label}</h2>
-            <p className="text-xs" style={{color: C.muted}}>{activeNav?.desc}</p>
+            <h2 className="text-base font-bold" style={{color: C.topbarText}}>{activeNav?.icon} {activeNav?.label}</h2>
+            <p className="text-xs" style={{color: C.topbarMuted}}>{activeNav?.desc}</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium" style={{background: C.badgeBg, color: C.badgeText, border: `1px solid ${C.badgeBorder}`}}>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium" style={{background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.25)'}}>
               🏠 Cognida.ai Helpdesk Portal
             </div>
             {/* Theme toggle in top-right corner */}
@@ -770,6 +977,9 @@ export default function HelpdeskPortal() {
           {renderMain()}
         </div>
       </div>
+
+      {/* ⚡ Quick Incident Modal */}
+      {quickModal && <QuickIncidentModal onClose={() => setQuickModal(false)} C={C} />}
     </div>
   )
 }

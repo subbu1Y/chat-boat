@@ -141,20 +141,35 @@ class DashboardStats(BaseModel):
 
 # ─────────────────────────── Assignment Routing ─────────────────────────────
 
-# Auto-assignment: infrastructure/security → Aditya, user-support → Subrahmanyam
+# Auto-assignment: infrastructure/security/network/hardware → Aditya
+#                  software/email/access/cloud/mobile/requests → Subrahmanyam
 ASSIGNMENT_MAP = {
-    "Network & Connectivity":   "aditya.kovoor@cognida.ai",
-    "Server & Infrastructure":  "aditya.kovoor@cognida.ai",
-    "Security":                 "aditya.kovoor@cognida.ai",
-    "Hardware & Devices":       "aditya.kovoor@cognida.ai",
-    "Software & Applications":  "subrahmanyam.pillalamarri@cognida.ai",
-    "Email & Communication":    "subrahmanyam.pillalamarri@cognida.ai",
-    "Access & Permissions":     "subrahmanyam.pillalamarri@cognida.ai",
-    "Other":                    "subrahmanyam.pillalamarri@cognida.ai",
-    # Legacy categories from old form
-    "Network":   "aditya.kovoor@cognida.ai",
-    "Hardware":  "aditya.kovoor@cognida.ai",
-    "Software":  "subrahmanyam.pillalamarri@cognida.ai",
+    # ── Aditya Kovoor ───────────────────────────────────────────────────────
+    "💻 Hardware Issues":                "aditya.kovoor@cognida.ai",
+    "🌐 Network & Internet":             "aditya.kovoor@cognida.ai",
+    "🛡️ Security Issues":               "aditya.kovoor@cognida.ai",
+    "🖨️ Printer & Scanning Issues":     "aditya.kovoor@cognida.ai",
+    "🔧 IT Maintenance / System Updates":"aditya.kovoor@cognida.ai",
+    "📱 Mobile Device Issues":           "aditya.kovoor@cognida.ai",
+    # ── Subrahmanyam Pillalamarri ───────────────────────────────────────────
+    "🖥️ Software Issues":               "subrahmanyam.pillalamarri@cognida.ai",
+    "📧 Email & Collaboration":          "subrahmanyam.pillalamarri@cognida.ai",
+    "🔐 Access Management":              "subrahmanyam.pillalamarri@cognida.ai",
+    "☁️ Cloud Services":                 "subrahmanyam.pillalamarri@cognida.ai",
+    "🆕 New Requests":                   "subrahmanyam.pillalamarri@cognida.ai",
+    "❓ Other / General IT Support":     "subrahmanyam.pillalamarri@cognida.ai",
+    # ── Legacy keys (kept for backwards compatibility) ──────────────────────
+    "Network & Connectivity":            "aditya.kovoor@cognida.ai",
+    "Server & Infrastructure":           "aditya.kovoor@cognida.ai",
+    "Security":                          "aditya.kovoor@cognida.ai",
+    "Hardware & Devices":                "aditya.kovoor@cognida.ai",
+    "Software & Applications":           "subrahmanyam.pillalamarri@cognida.ai",
+    "Email & Communication":             "subrahmanyam.pillalamarri@cognida.ai",
+    "Access & Permissions":              "subrahmanyam.pillalamarri@cognida.ai",
+    "Other":                             "subrahmanyam.pillalamarri@cognida.ai",
+    "Network":                           "aditya.kovoor@cognida.ai",
+    "Hardware":                          "aditya.kovoor@cognida.ai",
+    "Software":                          "subrahmanyam.pillalamarri@cognida.ai",
 }
 
 def _auto_assign(category: Optional[str]) -> str:

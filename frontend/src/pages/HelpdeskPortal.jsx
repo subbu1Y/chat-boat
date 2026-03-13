@@ -24,10 +24,19 @@ const ASSIGNMENT_MAP = {
   // → Subrahmanyam Pillalamarri
   '🖥️ Software Issues':                'subrahmanyam.pillalamarri@cognida.ai',
   '📧 Email & Collaboration':           'subrahmanyam.pillalamarri@cognida.ai',
-  '🔐 Access Management':               'subrahmanyam.pillalamarri@cognida.ai',
   '☁️ Cloud Services':                  'subrahmanyam.pillalamarri@cognida.ai',
-  '🆕 New Requests':                    'subrahmanyam.pillalamarri@cognida.ai',
   '❓ Other / General IT Support':      'subrahmanyam.pillalamarri@cognida.ai',
+  // Service Request categories
+  '🆕 New Hardware Request':            'aditya.kovoor@cognida.ai',
+  '💾 New Software Request':            'subrahmanyam.pillalamarri@cognida.ai',
+  '🆔 New Email ID / Account Setup':    'subrahmanyam.pillalamarri@cognida.ai',
+  '🔐 Access & Permission Requests':    'subrahmanyam.pillalamarri@cognida.ai',
+  '🔑 Password & Account Management':   'subrahmanyam.pillalamarri@cognida.ai',
+  '🌐 Network & Connectivity Setup':    'aditya.kovoor@cognida.ai',
+  '🖥️ IT Onboarding / Offboarding':    'subrahmanyam.pillalamarri@cognida.ai',
+  '🛒 Procurement Request':             'aditya.kovoor@cognida.ai',
+  '💡 IT Consultation':                 'subrahmanyam.pillalamarri@cognida.ai',
+  '❓ Other Service Request':           'subrahmanyam.pillalamarri@cognida.ai',
 }
 const ASSIGNEE_NAMES = {
   'aditya.kovoor@cognida.ai':             'Aditya Kovoor',
@@ -80,18 +89,6 @@ const INCIDENT_CATALOG = {
     'Firewall / port blocking',
     'Other network issue',
   ],
-  '🔐 Access Management': [
-    'New user access request',
-    'Application access request',
-    'Folder / shared drive access',
-    'Password reset',
-    'Account locked',
-    'Permission change',
-    'MFA / 2FA issue',
-    'Microsoft Azure access',
-    'Google Cloud Platform access',
-    'Other access issue',
-  ],
   '🖨️ Printer & Scanning Issues': [
     'Printer not printing',
     'Printer offline',
@@ -118,14 +115,6 @@ const INCIDENT_CATALOG = {
     'Cloud storage error',
     'Other cloud service issue',
   ],
-  '🆕 New Requests': [
-    'New laptop request',
-    'Software request',
-    'New email ID',
-    'New access request',
-    'Hardware upgrade',
-    'New peripheral / accessory',
-  ],
   '🔧 IT Maintenance / System Updates': [
     'Patch update issue',
     'Device update request',
@@ -148,13 +137,76 @@ const INCIDENT_CATALOG = {
 }
 
 const SERVICE_CATALOG = {
-  'New Equipment Request': ['New laptop / desktop','New monitor / peripheral','New mobile device','Office equipment setup'],
-  'Software Installation': ['New software license request','Install / upgrade application','Browser extension / plugin'],
-  'Account & Access Setup': ['New employee onboarding','Create new user account','Grant access to system / drive','VPN / remote access setup','Email account creation'],
-  'Network Setup': ['New office Wi-Fi setup','Network point installation','VPN configuration'],
-  'Procurement Request': ['Hardware procurement','Software procurement','IT accessories'],
-  'IT Consultation': ['IT policy / compliance query','Security awareness query','General IT guidance'],
-  'Other': ['Other service request (describe below)'],
+  '🆕 New Hardware Request': [
+    'New laptop request',
+    'New desktop request',
+    'New monitor / peripheral',
+    'New mobile device',
+    'Hardware upgrade',
+    'New peripheral / accessory',
+    'Office equipment setup',
+  ],
+  '💾 New Software Request': [
+    'New software license request',
+    'Install / upgrade application',
+    'Browser extension / plugin',
+    'Software request (Microsoft Excel / Word)',
+    'Software request (Google Chrome)',
+    'Other software request',
+  ],
+  '🆔 New Email ID / Account Setup': [
+    'New email ID creation',
+    'New employee onboarding',
+    'Create new user account',
+    'Email account configuration',
+    'Distribution list setup',
+  ],
+  '🔐 Access & Permission Requests': [
+    'New user access request',
+    'Application access request',
+    'Folder / shared drive access',
+    'VPN / remote access setup',
+    'Permission change request',
+    'MFA / 2FA setup',
+    'Microsoft Azure access',
+    'Google Cloud Platform access',
+    'Other access request',
+  ],
+  '🔑 Password & Account Management': [
+    'Password reset',
+    'Account unlock',
+    'Account locked out',
+    'Username change request',
+    'Account deactivation request',
+  ],
+  '🌐 Network & Connectivity Setup': [
+    'New office Wi-Fi setup',
+    'Network point installation',
+    'VPN configuration',
+    'IP configuration request',
+  ],
+  '🖥️ IT Onboarding / Offboarding': [
+    'New employee IT setup',
+    'Device provisioning',
+    'Software setup for new joiner',
+    'Exit / offboarding IT process',
+    'Asset handover',
+  ],
+  '🛒 Procurement Request': [
+    'Hardware procurement',
+    'Software procurement',
+    'IT accessories / consumables',
+    'Vendor / vendor coordination',
+  ],
+  '💡 IT Consultation': [
+    'IT policy / compliance query',
+    'Security awareness query',
+    'General IT guidance',
+    'Technology recommendation',
+  ],
+  '❓ Other Service Request': [
+    'Other service request (describe below)',
+  ],
 }
 
 const STATUS_COLORS = {

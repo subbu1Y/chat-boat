@@ -154,10 +154,19 @@ ASSIGNMENT_MAP = {
     # ── Subrahmanyam Pillalamarri ───────────────────────────────────────────
     "🖥️ Software Issues":               "subrahmanyam.pillalamarri@cognida.ai",
     "📧 Email & Collaboration":          "subrahmanyam.pillalamarri@cognida.ai",
-    "🔐 Access Management":              "subrahmanyam.pillalamarri@cognida.ai",
     "☁️ Cloud Services":                 "subrahmanyam.pillalamarri@cognida.ai",
-    "🆕 New Requests":                   "subrahmanyam.pillalamarri@cognida.ai",
     "❓ Other / General IT Support":     "subrahmanyam.pillalamarri@cognida.ai",
+    # ── Service Request categories ──────────────────────────────────────────
+    "🆕 New Hardware Request":           "aditya.kovoor@cognida.ai",
+    "💾 New Software Request":           "subrahmanyam.pillalamarri@cognida.ai",
+    "🆔 New Email ID / Account Setup":   "subrahmanyam.pillalamarri@cognida.ai",
+    "🔐 Access & Permission Requests":   "subrahmanyam.pillalamarri@cognida.ai",
+    "🔑 Password & Account Management":  "subrahmanyam.pillalamarri@cognida.ai",
+    "🌐 Network & Connectivity Setup":   "aditya.kovoor@cognida.ai",
+    "🖥️ IT Onboarding / Offboarding":   "subrahmanyam.pillalamarri@cognida.ai",
+    "🛒 Procurement Request":            "aditya.kovoor@cognida.ai",
+    "💡 IT Consultation":                "subrahmanyam.pillalamarri@cognida.ai",
+    "❓ Other Service Request":          "subrahmanyam.pillalamarri@cognida.ai",
     # ── Legacy keys (kept for backwards compatibility) ──────────────────────
     "Network & Connectivity":            "aditya.kovoor@cognida.ai",
     "Server & Infrastructure":           "aditya.kovoor@cognida.ai",

@@ -1,6 +1,7 @@
 """
 Email notification system for ticket creation.
-Sends email alerts when new tickets are created.
+Sends email alerts to the assigned engineer when a new ticket is created.
+Falls back to NOTIFICATION_EMAIL when no assignee is set.
 """
 import smtplib
 from email.mime.text import MIMEText
@@ -12,142 +13,200 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Email Configuration
-SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_SERVER   = os.getenv("SMTP_SERVER",   "smtp.gmail.com")
+SMTP_PORT     = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-NOTIFICATION_EMAIL = os.getenv("NOTIFICATION_EMAIL", "subrahmanyam.pillalamarri@cognida.ai aditya.kovoor@cognida.ai")
+
+# Fallback recipient when ticket has no assigned_to
+NOTIFICATION_EMAIL = os.getenv(
+    "NOTIFICATION_EMAIL",
+    "subrahmanyam.pillalamarri@cognida.ai"
+)
+
+# Human-friendly names for assignees used in the email body
+ASSIGNEE_NAMES = {
+    "subrahmanyam.pillalamarri@cognida.ai": "Subrahmanyam Pillalamarri",
+    "aditya.kovoor@cognida.ai":             "Aditya Kovoor",
+}
 
 
 def send_ticket_notification(ticket: dict) -> bool:
     """
-    Send email notification when a new ticket is created.
-    
+    Send email notification to the assignee when a new ticket is created.
+
+    - Uses ticket['assigned_to'] as the primary recipient.
+    - Falls back to NOTIFICATION_EMAIL if assigned_to is missing.
+    - Both the assignee and NOTIFICATION_EMAIL receive the mail when they differ.
+
     Args:
-        ticket: Dictionary containing ticket details (id, subject, description, priority, etc.)
-    
+        ticket: Dictionary containing ticket details (id, subject, description,
+                priority, status, category, assigned_to, created_at, …)
+
     Returns:
-        bool: True if email sent successfully, False otherwise
+        bool: True if email sent successfully, False otherwise.
     """
     try:
-        # Check if SMTP is configured
         if not SMTP_USERNAME or not SMTP_PASSWORD:
             print("[EMAIL] Email notification skipped: SMTP credentials not configured")
             return False
 
-        # Create email message
-        msg = MIMEMultipart('alternative')
-        msg['From'] = SMTP_USERNAME
-        msg['To'] = NOTIFICATION_EMAIL
-        msg['Subject'] = f"New IT Help Desk Ticket: {ticket['id']} - {ticket['subject']}"
+        # ── Determine recipients ──────────────────────────────────────────────
+        assignee_email = (ticket.get("assigned_to") or "").strip()
+        fallback_email = NOTIFICATION_EMAIL.strip()
 
-        # Format creation time
-        created_at = ticket.get('created_at', datetime.now().isoformat())
+        # Build a deduplicated list: assignee first, then fallback if different
+        recipients = [assignee_email] if assignee_email else [fallback_email]
+        if fallback_email and fallback_email not in recipients:
+            recipients.append(fallback_email)
+
+        to_header  = ", ".join(recipients)          # MIME To: header
+        assignee_name = ASSIGNEE_NAMES.get(assignee_email, assignee_email or "IT Team")
+
+        # ── Format creation time ─────────────────────────────────────────────
+        created_at = ticket.get("created_at", datetime.now().isoformat())
         try:
-            created_dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-            formatted_time = created_dt.strftime('%B %d, %Y at %I:%M %p')
-        except:
-            formatted_time = created_at[:19].replace('T', ' ')
+            created_dt     = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+            formatted_time = created_dt.strftime("%B %d, %Y at %I:%M %p UTC")
+        except Exception:
+            formatted_time = created_at[:19].replace("T", " ")
 
-        # HTML email body
+        priority      = ticket.get("priority", "Medium")
+        status        = ticket.get("status",   "Open")
+        category      = ticket.get("category") or "—"
+        ticket_id     = ticket["id"]
+        subject_text  = ticket["subject"]
+        description   = ticket["description"]
+
+        # ── Build email ───────────────────────────────────────────────────────
+        msg            = MIMEMultipart("alternative")
+        msg["From"]    = SMTP_USERNAME
+        msg["To"]      = to_header
+        msg["Subject"] = f"[Cognida IT Helpdesk] New Ticket Assigned: {ticket_id} – {subject_text}"
+
+        # HTML body
         html_body = f"""
         <!DOCTYPE html>
         <html>
         <head>
             <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%); 
-                           color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }}
-                .content {{ background: #f8f7ff; padding: 25px; border: 1px solid #e2e8f0; 
-                           border-top: none; border-radius: 0 0 8px 8px; }}
-                .field {{ margin-bottom: 15px; }}
-                .label {{ font-weight: bold; color: #5a67d8; }}
-                .value {{ margin-top: 5px; padding: 10px; background: white; 
-                         border-left: 4px solid #5a67d8; border-radius: 4px; }}
-                .priority-high {{ border-left-color: #e53e3e; }}
-                .priority-medium {{ border-left-color: #dd6b20; }}
-                .priority-low {{ border-left-color: #38a169; }}
-                .footer {{ margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; 
-                          font-size: 0.9em; color: #718096; }}
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
+                .container {{ max-width: 620px; margin: 30px auto; border-radius: 10px; overflow: hidden;
+                              box-shadow: 0 4px 20px rgba(0,0,0,0.10); }}
+                .header {{ background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+                           color: white; padding: 24px 28px; text-align: center; }}
+                .header h2 {{ margin: 0 0 4px 0; font-size: 20px; }}
+                .header p  {{ margin: 0; font-size: 13px; opacity: 0.85; }}
+                .banner {{ background: #fff7ed; border-left: 5px solid #f97316;
+                           padding: 14px 20px; font-size: 14px; color: #7c3a00; }}
+                .content {{ background: #f8f7ff; padding: 24px 28px; }}
+                .field   {{ margin-bottom: 14px; }}
+                .label   {{ font-weight: bold; color: #5a67d8; font-size: 12px;
+                            text-transform: uppercase; letter-spacing: 0.05em; }}
+                .value   {{ margin-top: 4px; padding: 10px 14px; background: white;
+                            border-left: 4px solid #5a67d8; border-radius: 4px;
+                            font-size: 14px; }}
+                .priority-high     {{ border-left-color: #e53e3e; color: #c53030; font-weight: bold; }}
+                .priority-critical {{ border-left-color: #7b2d00; color: #7b2d00; font-weight: bold; }}
+                .priority-medium   {{ border-left-color: #dd6b20; }}
+                .priority-low      {{ border-left-color: #38a169; }}
+                .grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }}
+                .footer {{ margin-top: 20px; padding-top: 14px; border-top: 1px solid #e2e8f0;
+                           font-size: 12px; color: #718096; text-align: center; }}
             </style>
         </head>
         <body>
-            <div class="container">
-                <div class="header">
-                    <h2 style="margin: 0;">New IT Help Desk Ticket</h2>
-                    <p style="margin: 5px 0 0 0;">Cognida.ai Help Desk System</p>
-                </div>
-                <div class="content">
-                    <div class="field">
-                        <div class="label">Ticket ID:</div>
-                        <div class="value">{ticket['id']}</div>
-                    </div>
-                    
-                    <div class="field">
-                        <div class="label">Subject:</div>
-                        <div class="value">{ticket['subject']}</div>
-                    </div>
-                    
-                    <div class="field">
-                        <div class="label">Description:</div>
-                        <div class="value">{ticket['description']}</div>
-                    </div>
-                    
-                    <div class="field">
-                        <div class="label">Priority:</div>
-                        <div class="value priority-{ticket.get('priority', 'Medium').lower()}">{ticket.get('priority', 'Medium')}</div>
-                    </div>
-                    
-                    <div class="field">
-                        <div class="label">Status:</div>
-                        <div class="value">{ticket.get('status', 'Open')}</div>
-                    </div>
-                    
-                    <div class="field">
-                        <div class="label">Created:</div>
-                        <div class="value">{formatted_time}</div>
-                    </div>
-                    
-                    <div class="footer">
-                        <p>This is an automated notification from the Cognida.ai IT Help Desk system.</p>
-                        <p>Please do not reply to this email. To respond to this ticket, please use the Help Desk system.</p>
-                    </div>
-                </div>
+          <div class="container">
+            <div class="header">
+              <h2>🎫 New Helpdesk Ticket Assigned to You</h2>
+              <p>Cognida.ai IT Help Desk — automated notification</p>
             </div>
+
+            <div class="banner">
+              Hi <strong>{assignee_name}</strong>, a new ticket has been logged and assigned to you.
+              Please review and respond as soon as possible.
+            </div>
+
+            <div class="content">
+              <div class="grid">
+                <div class="field">
+                  <div class="label">Ticket ID</div>
+                  <div class="value"><strong>{ticket_id}</strong></div>
+                </div>
+                <div class="field">
+                  <div class="label">Status</div>
+                  <div class="value">{status}</div>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="label">Subject</div>
+                <div class="value">{subject_text}</div>
+              </div>
+
+              <div class="grid">
+                <div class="field">
+                  <div class="label">Priority</div>
+                  <div class="value priority-{priority.lower()}">{priority}</div>
+                </div>
+                <div class="field">
+                  <div class="label">Category</div>
+                  <div class="value">{category}</div>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="label">Description</div>
+                <div class="value" style="white-space: pre-wrap;">{description}</div>
+              </div>
+
+              <div class="field">
+                <div class="label">Logged at</div>
+                <div class="value">{formatted_time}</div>
+              </div>
+
+              <div class="footer">
+                This is an automated notification from the Cognida.ai IT Help Desk system.<br>
+                Please do not reply to this email. Manage the ticket directly in the Help Desk portal.
+              </div>
+            </div>
+          </div>
         </body>
         </html>
         """
 
-        # Plain text alternative
+        # Plain-text fallback
         text_body = f"""
-New IT Help Desk Ticket Created
-================================
+Hi {assignee_name},
 
-Ticket ID: {ticket['id']}
-Subject: {ticket['subject']}
-Description: {ticket['description']}
-Priority: {ticket.get('priority', 'Medium')}
-Status: {ticket.get('status', 'Open')}
-Created: {formatted_time}
+A new IT Help Desk ticket has been assigned to you.
+
+Ticket ID   : {ticket_id}
+Subject     : {subject_text}
+Priority    : {priority}
+Category    : {category}
+Status      : {status}
+Logged at   : {formatted_time}
+
+Description:
+{description}
 
 ---
 This is an automated notification from the Cognida.ai IT Help Desk system.
+Please manage this ticket via the Help Desk portal.
         """
 
-        # Attach both HTML and plain text versions
-        part1 = MIMEText(text_body, 'plain')
-        part2 = MIMEText(html_body, 'html')
+        part1 = MIMEText(text_body, "plain")
+        part2 = MIMEText(html_body, "html")
         msg.attach(part1)
         msg.attach(part2)
 
-        # Send email
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_USERNAME, SMTP_PASSWORD)
-            server.send_message(msg)
+            server.sendmail(SMTP_USERNAME, recipients, msg.as_string())
 
-        print(f"[EMAIL] Email notification sent to {NOTIFICATION_EMAIL} for ticket {ticket['id']}")
+        print(f"[EMAIL] Ticket {ticket_id} notification sent → {to_header}")
         return True
 
     except Exception as e:

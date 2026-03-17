@@ -50,7 +50,7 @@ MAX_HISTORY = 10  # maximum chat history to maintain
 TEMPERATURE = 0.4  # lower = more focused and consistent answers
 MAX_TOKENS = 1500  # allow longer, complete responses
 
-# API Configuration (for Streamlit calling FastAPI backend)
+# API Configuration (React frontend proxies /api to FastAPI backend)
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 # Email Notification Configuration

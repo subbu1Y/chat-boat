@@ -6,6 +6,9 @@ import Chat from './components/Chat'
 import Dashboard from './components/Dashboard'
 import TicketForm from './components/TicketForm'
 import HelpdeskPortal from './pages/HelpdeskPortal'
+import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
+import { useAuth } from './context/AuthContext'
 import './App.css'
 
 function generateSessionId() {
@@ -74,13 +77,45 @@ function ChatApp() {
   )
 }
 
+/** Guard: redirect to /auth/login if not authenticated */
+function ProtectedRoute({ children, adminOnly = false }) {
+  const { user, loading } = useAuth()
+  if (loading) return (
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg,#5a67d8,#6b46c1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: '#fff', fontSize: '1.1rem' }}>Loading…</div>
+    </div>
+  )
+  if (!user) return <Navigate to="/auth/login" replace />
+  if (adminOnly && user.role !== 'admin') return <Navigate to="/helpdesk" replace />
+  return children
+}
+
 function App() {
   return (
     <Routes>
-      <Route path="/"          element={<HelpdeskPortal />} />
-      <Route path="/userhelpdesk"  element={<HelpdeskPortal />} />
-      <Route path="/dashboard" element={<ChatApp />} />
-      <Route path="*"          element={<Navigate to="/" replace />} />
+      {/* Auth pages */}
+      <Route path="/auth/login"    element={<SignIn />} />
+      <Route path="/auth/register" element={<SignUp />} />
+
+      {/* Helpdesk portal — all authenticated users */}
+      <Route path="/helpdesk" element={
+        <ProtectedRoute>
+          <HelpdeskPortal />
+        </ProtectedRoute>
+      } />
+
+      {/* AI Chatbot + Admin dashboard — admin only */}
+      <Route path="/dashboard" element={
+        <ProtectedRoute adminOnly>
+          <ChatApp />
+        </ProtectedRoute>
+      } />
+
+      {/* Root redirect */}
+      <Route path="/" element={<Navigate to="/auth/login" replace />} />
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>
   )
 }

@@ -1,43 +1,49 @@
-# LLM Provider Configuration
-# Choose one: "gemini", "grok", "openai", or "groq"
-LLM_PROVIDER=gemini
+# ============================================================
+# Cognida.ai IT Helpdesk — Environment Configuration
+# ============================================================
+# Copy this file to ".env" (remove the .txt extension) and fill in your values.
+# The .env file is NOT committed to git (it contains secrets).
 
-# Google Gemini API (free tier at https://aistudio.google.com/apikey)
+# ── LLM Provider ────────────────────────────────────────────
+# Choose one: groq (free), gemini, grok, openai
+LLM_PROVIDER=groq
+
+# Groq API — FREE tier, fastest (recommended)
+# Get key at: https://console.groq.com/keys
+GROQ_API_KEY=your_groq_api_key_here
+# GROQ_MODEL=llama-3.1-8b-instant    # fast
+# GROQ_MODEL=llama-3.1-70b-versatile # better quality
+
+# Google Gemini API — free tier
+# Get key at: https://aistudio.google.com/apikey
 GOOGLE_API_KEY=your_google_api_key_here
 # GEMINI_MODEL=gemini-2.0-flash
 
-# Grok API Configuration (requires credits)
-# Get your API key from: https://console.x.ai/
+# Grok API (X.AI) — requires credits
+# Get key at: https://console.x.ai/
 GROK_API_KEY=your_grok_api_key_here
 
-# OpenAI API Configuration (free trial credits available)
-# Get your API key from: https://platform.openai.com/api-keys
+# OpenAI API — requires credits
+# Get key at: https://platform.openai.com/api-keys
 OPENAI_API_KEY=your_openai_api_key_here
 
-# Groq API Configuration (FREE tier available - RECOMMENDED!)
-# Get your API key from: https://console.groq.com/keys
-GROQ_API_KEY=your_groq_api_key_here
-
-# Email Notification Configuration (for ticket alerts)
-# Sends email to specified address when new tickets are created
+# ── Email Notifications ──────────────────────────────────────
+# Sends email to IT engineer when a new ticket is assigned
 SMTP_SERVER=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USERNAME=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
+SMTP_USERNAME=your-gmail@gmail.com
+SMTP_PASSWORD=your-16-char-app-password
 NOTIFICATION_EMAIL=subrahmanyam.pillalamarri@cognida.ai
 
-# Gmail App Password Setup (if using Gmail):
+# Gmail App Password setup:
 # 1. Go to https://myaccount.google.com/apppasswords
-# 2. Generate an "App Password" for "Mail"
+# 2. Generate App Password for "Mail"
 # 3. Use that 16-character password as SMTP_PASSWORD
-# Note: Regular Gmail password won't work - you MUST use App Password
+# Note: Regular Gmail password will NOT work
 
-# API Configuration (Streamlit calls FastAPI - optional override)
-# API_BASE_URL=http://localhost:8000
-
-# PostgreSQL Database Configuration (Optional)
+# ── PostgreSQL Database ──────────────────────────────────────
 # Set USE_DATABASE=true for persistent tickets + chat history
-# Run: python scripts/setup_db.py after creating the database
+# Run: python scripts/setup_db.py  (after creating the database)
 USE_DATABASE=false
 DB_HOST=localhost
 DB_PORT=5432
@@ -45,11 +51,16 @@ DB_NAME=helpdesk_db
 DB_USER=postgres
 DB_PASSWORD=your_postgres_password
 
-# Instructions:
-# 1. Choose your LLM_PROVIDER (groq is free and fast!)
-# 2. Add the corresponding API key
-# 3. (Optional) Configure email notifications for ticket alerts
-# 4. (Optional) PostgreSQL: Create DB, set credentials above, run scripts/setup_db.py
-# 5. Save this file as ".env" (without .txt extension)
-# 6. Restart your Streamlit app
+# ── JWT Authentication ───────────────────────────────────────
+JWT_SECRET_KEY=cognida-helpdesk-secret-key-2026
+JWT_ALGORITHM=HS256
+JWT_EXPIRE_HOURS=24
 
+# ── Quick Setup Steps ────────────────────────────────────────
+# 1. pip install -r requirements.txt
+# 2. cd frontend && npm install
+# 3. python indexer.py          (index knowledge base — run once)
+# 4. Copy this file to .env and fill in at minimum GROQ_API_KEY
+# 5. python -m uvicorn backend.api:app --host 0.0.0.0 --port 8000 --reload
+# 6. cd frontend && npm run dev
+# 7. Open http://localhost:5173/auth/register  (create first user)

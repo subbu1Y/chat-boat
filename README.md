@@ -40,11 +40,6 @@ A Retrieval-Augmented Generation (RAG) based chatbot for IT Help Desk support, p
         │         │ Gemini/   │          │ Embeddings  │
         │         │ Grok/Groq │          │(SentenceTr.)│
         │         └───────────┘          └─────────────┘
-        │
-   ┌────▼────┐  (optional - legacy)
-   │Streamlit│  streamlit run app.py
-   │ app.py  │
-   └─────────┘
 ```
 
 ### How RAG Works in This System
@@ -145,14 +140,6 @@ cd frontend && npm run dev
 ```
 
 3. Open **http://localhost:5173** in your browser
-
-**Option B: Streamlit (Legacy)**
-
-```bash
-streamlit run app.py
-```
-
-Opens at `http://localhost:8501`. Streamlit calls the backend when running; if backend is down, it falls back to direct RAG.
 
 ### Step 3: Ask Questions
 
@@ -275,7 +262,6 @@ Chat-bot 2.0/
 │   │   └── services/api.js        # Axios API client
 │   ├── package.json
 │   └── vite.config.js
-├── app.py                          # Streamlit frontend (legacy)
 ├── rag_backend.py                  # RAG logic & LLM integration
 ├── indexer.py                      # Document processing & indexing
 ├── config.py                       # Configuration settings
@@ -294,7 +280,7 @@ Chat-bot 2.0/
    ```bash
    python indexer.py
    ```
-3. Restart the Streamlit app (or click "Reload Knowledge Base" in sidebar)
+3. Restart the backend server
 
 **Best Practices**:
 - Use clear, descriptive filenames
@@ -394,12 +380,12 @@ To extend this chatbot:
 1. **Add new document formats**: Modify `indexer.py` `read_documents()` method
 2. **Change chunking strategy**: Update `create_chunks()` method
 3. **Use different LLM**: Replace Grok API calls in `rag_backend.py`
-4. **Improve UI**: Customize `app.py` Streamlit components
+4. **Improve UI**: Customize React components in `frontend/src/`
 5. **Add features**: Extend functionality in respective modules
 
 ## Tech Stack 🛠️
 
-- **Frontend**: React + Vite (primary), Streamlit (legacy)
+- **Frontend**: React + Vite
 - **Backend**: FastAPI
 - **LLM**: Google Gemini, Grok, Groq, or OpenAI (configurable)
 - **Embeddings**: Sentence Transformers (all-MiniLM-L6-v2)
@@ -422,7 +408,6 @@ For questions or issues:
 
 - X.AI for Grok LLM API
 - Sentence Transformers team for embedding models
-- Streamlit for the amazing UI framework
 - Open source community for inspiration
 
 ---

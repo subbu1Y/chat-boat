@@ -1,84 +1,62 @@
 # Run Instructions
 
-**Primary frontend:** React + Vite. Streamlit is available as legacy/fallback.
+**Frontend:** React + Vite  
+**Backend:** FastAPI + Uvicorn  
+**Database:** PostgreSQL (optional, JSON fallback available)
+
+---
+
+## Quick Start
+
+### Terminal 1 — Backend
+```powershell
+cd "C:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0"
+python -m uvicorn backend.api:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### Terminal 2 — Frontend
+```powershell
+cd "C:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0\frontend"
+npm run dev
+```
+
+Or use the combined launcher:
+```powershell
+start_all.bat
+```
+
+---
+
+## URLs
+
+| Service | URL |
+|---------|-----|
+| Helpdesk Portal | http://localhost:5173/helpdesk |
+| Login Page | http://localhost:5173/auth/login |
+| Register | http://localhost:5173/auth/register |
+| Admin Chat + Dashboard | http://localhost:5173/dashboard |
+| API Backend | http://localhost:8000 |
+| API Swagger Docs | http://localhost:8000/docs |
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Streamlit      │     │  React (Vite)   │     │  FastAPI        │
-│  app.py         │     │  frontend/      │     │  backend/      │
-│  (port 8501)    │     │  (port 5173)    │     │  (port 8000)    │
-└────────┬────────┘     └────────┬────────┘     └────────┬────────┘
-         │                        │                        │
-         │   HTTP /api/chat       │   Proxy /api → :8000   │
-         └────────────────────────┴────────────────────────┘
-                                 │
-                                 ▼
-                    RAG (rag_backend.py) + tickets.py
+┌─────────────────┐       ┌──────────────────┐       ┌──────────────────┐
+│  React + Vite   │       │    FastAPI        │       │   PostgreSQL     │
+│  frontend/      │──────▶│  backend/api.py   │──────▶│   helpdesk_db   │
+│  port: 5173     │ /api  │  port: 8000       │       │   port: 5432    │
+└─────────────────┘       └────────┬─────────┘       └──────────────────┘
+                                   │
+                    ┌──────────────┴──────────────┐
+                    │                             │
+             ┌──────▼──────┐             ┌────────▼───────┐
+             │ RAG Backend  │             │  Email Notifier │
+             │ rag_backend  │             │ email_notifier  │
+             │ (Groq LLM)   │             │  (SMTP Gmail)   │
+             └─────────────┘             └────────────────┘
 ```
-
----
-
-## 1. Run FastAPI Backend
-
-Required for chat. Both Streamlit and React will use it.
-
-```powershell
-cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0"
-python backend/api.py
-```
-
-- **URL:** http://localhost:8000
-- **Health check:** http://localhost:8000/
-
----
-
-## 2. Run React (Vite) Frontend (Primary)
-
-Requires the backend to be running.
-
-```powershell
-cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0\frontend"
-npm install
-npm run dev
-```
-
-- **URL:** http://localhost:5173
-- **Proxy:** `/api` → `http://localhost:8000`
-
----
-
-## 3. Streamlit Frontend (Optional / Legacy)
-
-Can run with or without the backend. If backend is down, Streamlit falls back to direct RAG.
-
-```powershell
-cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0"
-streamlit run app.py
-```
-
-- **URL:** http://localhost:8501
-
----
-
-## Quick Start (React + Backend)
-
-**Terminal 1 – Backend:**
-```powershell
-cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0"
-python backend/api.py
-```
-
-**Terminal 2 – React Frontend:**
-```powershell
-cd "c:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0\frontend"
-npm run dev
-```
-
-Open **http://localhost:5173**
 
 ---
 
@@ -86,29 +64,28 @@ Open **http://localhost:5173**
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | /api/chat | Chat with RAG backend |
-| GET | /api/chat/history/{session_id} | Get chat history (PostgreSQL) |
-| POST | /api/tickets | Create a ticket |
-| GET | /api/tickets | Get recent tickets |
-| GET | /api/tickets/all | Get all tickets |
-| GET | /api/dashboard/stats | Dashboard statistics |
-| GET | /api/config | Public config |
-| GET | / | Health check |
+| POST | /api/auth/register | Register new user |
+| POST | /api/auth/login | Login, returns JWT |
+| GET | /api/auth/me | Get current user |
+| POST | /api/chat | RAG chatbot |
+| POST | /api/helpdesk/ticket | Create helpdesk ticket |
+| POST | /api/helpdesk/quick-ticket | One-click Quick Incident |
+| GET | /api/my-tickets | Get tickets by user email |
+| GET | /api/tickets/track/{id} | Track ticket by ID |
+| PATCH | /api/tickets/{id}/status | Update ticket status |
+| GET | /api/dashboard/stats | KPI + chart statistics |
+| GET | /api/tickets/all | All tickets for admin |
 
 ---
 
 ## PostgreSQL Integration (Optional)
 
-The chatbot and ticket dashboard can use PostgreSQL for persistent storage.
-
-**1. Install PostgreSQL** (if not installed)
-
-**2. Create database:**
+**1. Create database:**
 ```powershell
 psql -U postgres -c "CREATE DATABASE helpdesk_db;"
 ```
 
-**3. Configure .env:**
+**2. Configure .env:**
 ```
 USE_DATABASE=true
 DB_HOST=localhost
@@ -118,20 +95,46 @@ DB_USER=postgres
 DB_PASSWORD=your_postgres_password
 ```
 
-**4. Run setup script:**
+**3. Run setup script:**
 ```powershell
 python scripts/setup_db.py
 ```
 
-**5. Restart the backend.** Tickets and chat history will be stored in PostgreSQL.
-
-When `USE_DATABASE=false`, the app uses JSON file storage (tickets.json) — no database required.
+When `USE_DATABASE=false`, the app uses JSON file storage — no database required.
 
 ---
 
 ## Prerequisites
 
-1. **Python:** `pip install -r requirements.txt`
-2. **Node.js:** For React frontend (`npm install` in `frontend/`)
-3. **Knowledge base:** Run `python indexer.py` before first use
-4. **Environment:** Copy `env_template.txt` to `.env` and set API keys
+1. **Python dependencies:** `pip install -r requirements.txt`
+2. **Node.js dependencies:** `cd frontend && npm install`
+3. **Knowledge base:** `python indexer.py` (run once before first use)
+4. **Environment:** Copy `env_template.txt` to `.env` and set API keys + SMTP
+
+---
+
+## Environment Variables (.env)
+
+```env
+# LLM (choose one)
+GROQ_API_KEY=your_groq_api_key
+GOOGLE_API_KEY=your_google_api_key
+
+# Email notifications
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+NOTIFICATION_EMAIL=subrahmanyam.pillalamarri@cognida.ai
+
+# Database (optional)
+USE_DATABASE=true
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=helpdesk_db
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password
+
+# JWT auth
+JWT_SECRET_KEY=cognida-helpdesk-secret-key-2026
+```

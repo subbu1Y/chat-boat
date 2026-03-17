@@ -14,6 +14,9 @@ venv/
 ENV/
 env/
 
+# Streamlit
+.streamlit/secrets.toml
+
 # Ticket storage (local JSON)
 tickets.json
 

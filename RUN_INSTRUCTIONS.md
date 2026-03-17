@@ -1,6 +1,7 @@
 # Run Instructions
 
-**Frontend:** React + Vite  
+**Primary Frontend:** React + Vite  
+**Legacy Frontend:** Streamlit (also supported — runs independently)  
 **Backend:** FastAPI + Uvicorn  
 **Database:** PostgreSQL (optional, JSON fallback available)
 
@@ -24,6 +25,19 @@ Or use the combined launcher:
 ```powershell
 start_all.bat
 ```
+
+---
+
+## Option B — Streamlit (Legacy, runs alongside React)
+
+```powershell
+cd "C:\Users\SubrahmanyamPillalam\Downloads\Chat-bot 2.0"
+streamlit run app.py
+```
+
+Opens at **http://localhost:8501**  
+Streamlit calls the FastAPI backend (`/api/chat`) when it's running, or falls back to direct RAG if the backend is down.  
+React Vite and Streamlit can run at the same time — they use different ports.
 
 ---
 

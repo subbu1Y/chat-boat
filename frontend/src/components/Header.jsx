@@ -38,12 +38,6 @@ function Header({ onDashboardClick, darkMode, onToggleTheme }) {
             </>
           )}
         </button>
-        <Link
-          to="/helpdesk"
-          className="flex items-center gap-1.5 px-4 py-2 bg-white border border-indigo-300 text-indigo-700 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition-colors"
-        >
-          🎫 Raise a Ticket
-        </Link>
         <button className="dashboard-btn" onClick={onDashboardClick}>
           📊 Ticket Dashboard
         </button>

@@ -1,6 +1,66 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { createHelpdeskTicket, getMyTickets, trackTicket, createQuickTicket } from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { EMPLOYEE_DIRECTORY } from '../config/employees'
+
+/** Normalize a string: lowercase, remove extra spaces */
+const norm = s => s.trim().toLowerCase()
+/** Normalize removing ALL spaces (for combined-word matching) */
+const compact = s => s.trim().toLowerCase().replace(/\s+/g, '')
+
+/** Return employees whose name starts with / contains the query (for dropdown suggestions) */
+function searchEmployees(query) {
+  if (!query.trim()) return []
+  const q = norm(query)
+  const qc = compact(query)
+  return EMPLOYEE_DIRECTORY.filter(emp => {
+    const n  = norm(emp.name)
+    const nc = compact(emp.name)
+    return nc.startsWith(qc) || n.startsWith(q) || n.includes(q)
+  }).slice(0, 6)
+}
+
+/** Given a typed name, return the best-matching email or auto-generate one */
+function resolveEmail(rawName) {
+  const trimmed = rawName.trim()
+  if (!trimmed) return ''
+  const qc = compact(trimmed)
+  const q  = norm(trimmed)
+
+  // 1. Exact full-name match (no spaces) e.g. "pradeepyara" === "pradeepyara"
+  for (const emp of EMPLOYEE_DIRECTORY) {
+    if (compact(emp.name) === qc) return emp.email
+  }
+  // 2. Exact full-name match (with spaces) e.g. "Pradeep Yara"
+  for (const emp of EMPLOYEE_DIRECTORY) {
+    if (norm(emp.name) === q) return emp.email
+  }
+  // 3. Combined name starts with query (min 4 chars) e.g. "pradeepy" → "pradeepyara"
+  if (qc.length >= 4) {
+    for (const emp of EMPLOYEE_DIRECTORY) {
+      if (compact(emp.name).startsWith(qc)) return emp.email
+    }
+  }
+  // 4. First-name exact match (single word typed)
+  const words = trimmed.toLowerCase().split(/\s+/).filter(Boolean)
+  if (words.length === 1) {
+    for (const emp of EMPLOYEE_DIRECTORY) {
+      const parts = emp.name.toLowerCase().split(/\s+/)
+      if (parts[0] === words[0]) return emp.email
+    }
+  }
+  // 5. First + Last name typed with space e.g. "Pradeep Y" → "pradeep.yara@cognida.ai"
+  if (words.length >= 2) {
+    for (const emp of EMPLOYEE_DIRECTORY) {
+      const parts = emp.name.toLowerCase().split(/\s+/)
+      if (parts[0] === words[0] && parts[parts.length-1].startsWith(words[words.length-1])) return emp.email
+    }
+  }
+  // Fallback: auto-generate firstname.lastname@cognida.ai
+  if (words.length === 0) return ''
+  if (words.length === 1) return words[0] + '@cognida.ai'
+  return words[0] + '.' + words[words.length - 1] + '@cognida.ai'
+}
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -356,12 +416,21 @@ function TicketForm({ ticketType, catalog, onSuccess, C }) {
   const [dragOver, setDragOver]       = useState(false)
   const [loading, setLoading]         = useState(false)
   const [error, setError]             = useState('')
-  const fileInputRef                  = useRef(null)
+  const [emailEdited, setEmailEdited]       = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const nameRef                             = useRef(null)
+  const fileInputRef                        = useRef(null)
   const MAX_FILES = 5
 
   const IS = { background: C.inputBg, borderColor: C.inputBorder, color: C.inputText }
 
   const set = (f, v) => setForm(p => ({ ...p, [f]: v }))
+
+  // Auto-detect email from directory or generate from name
+  useEffect(() => {
+    if (emailEdited) return
+    set('email', resolveEmail(form.name))
+  }, [form.name, emailEdited])
   const nextStep = () => { setError(''); setStep(s => s + 1) }
   const prevStep = () => { setError(''); setStep(s => s - 1) }
 
@@ -407,7 +476,7 @@ function TicketForm({ ticketType, catalog, onSuccess, C }) {
   const categories = Object.keys(catalog)
 
   return (
-    <div className="p-4">
+    <div className="rounded-2xl shadow-md border p-4" style={{background: C.card, borderColor: C.cardBorder}}>
       {/* Step indicator */}
       <div className="w-full mb-4">
         <div className="flex items-center rounded-xl px-6 py-3" style={{background: C.stepBg}}>
@@ -434,15 +503,73 @@ function TicketForm({ ticketType, catalog, onSuccess, C }) {
               <h3 style={{color: C.text}} className="text-lg font-bold">Your Details</h3>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div>
+              <div className="relative">
                 <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Full Name <span className="text-red-500">*</span></label>
-                <input type="text" value={form.name} onChange={e=>set('name',e.target.value)} placeholder="e.g. Subrahmanyam P"
-                  style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                <input
+                  ref={nameRef}
+                  type="text"
+                  value={form.name}
+                  onChange={e => { set('name', e.target.value); setShowSuggestions(true) }}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                  placeholder="Start typing your name…"
+                  style={IS}
+                  className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  autoComplete="off"
+                />
+                {/* Dropdown suggestions */}
+                {showSuggestions && searchEmployees(form.name).length > 0 && (
+                  <ul className="absolute z-50 left-0 right-0 mt-1 rounded-xl shadow-lg border overflow-hidden"
+                    style={{ background: C.card, borderColor: C.cardBorder }}>
+                    {searchEmployees(form.name).map(emp => (
+                      <li key={emp.email}>
+                        <button
+                          type="button"
+                          onMouseDown={() => {
+                            set('name', emp.name)
+                            set('email', emp.email)
+                            setEmailEdited(false)
+                            setShowSuggestions(false)
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm hover:bg-indigo-50 transition-colors flex justify-between items-center gap-2"
+                          style={{ color: C.text }}
+                        >
+                          <span className="font-medium">{emp.name}</span>
+                          <span className="text-xs truncate" style={{ color: C.dim }}>{emp.email}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
               <div>
-                <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">Work Email <span className="text-red-500">*</span></label>
-                <input type="email" value={form.email} onChange={e=>set('email',e.target.value)} placeholder="you@cognida.ai"
-                  style={IS} className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                <label style={{color: C.label}} className="block text-sm font-semibold mb-1.5">
+                  Work Email <span className="text-red-500">*</span>
+                  {!emailEdited && form.email && (() => {
+                    const fromDir = EMPLOYEE_DIRECTORY.some(e => e.email === form.email)
+                    return fromDir
+                      ? <span className="ml-2 text-xs font-normal px-1.5 py-0.5 rounded-full bg-green-100 text-green-600">✓ matched from directory</span>
+                      : <span className="ml-2 text-xs font-normal px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-600">⚡ auto-generated</span>
+                  })()}
+                </label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={e => { setEmailEdited(true); set('email', e.target.value) }}
+                  onFocus={() => { if (!form.email) setEmailEdited(false) }}
+                  placeholder="you@cognida.ai"
+                  style={IS}
+                  className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+                {emailEdited && (
+                  <button
+                    type="button"
+                    onClick={() => setEmailEdited(false)}
+                    className="mt-1 text-xs text-indigo-500 hover:text-indigo-700 underline"
+                  >
+                    ↺ Reset to auto-detect
+                  </button>
+                )}
               </div>
             </div>
             <div>
@@ -1136,8 +1263,10 @@ export default function HelpdeskPortal() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          {renderMain()}
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-2xl mx-auto">
+            {renderMain()}
+          </div>
         </div>
       </div>
 

@@ -30,6 +30,9 @@ tickets.json
 # Node / React
 node_modules/
 
+# Employee directory — confidential, never push to GitHub
+frontend/src/config/employees.js
+
 # OS
 .DS_Store
 Thumbs.db

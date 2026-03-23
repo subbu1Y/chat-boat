@@ -4,6 +4,7 @@ Uses SQLAlchemy ORM for ticket management (PostgreSQL) with JSON fallback.
 """
 from contextlib import asynccontextmanager
 from datetime import datetime
+import asyncio
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -195,6 +196,11 @@ def _auto_assign(category: Optional[str]) -> str:
 VALID_STATUSES = {"Open", "Pending", "Resolved", "Closed"}
 
 
+async def _run_blocking(callable_obj, *args, timeout: float = 8.0):
+    """Run blocking DB work off the event loop with a timeout."""
+    return await asyncio.wait_for(asyncio.to_thread(callable_obj, *args), timeout=timeout)
+
+
 def _orm_create_ticket(subject: str, description: str, priority: str, category: Optional[str]) -> dict:
     """Create ticket using SQLAlchemy ORM with auto-assignment."""
     from backend.db_orm import get_db
@@ -335,11 +341,14 @@ async def get_tickets_list(limit: int = 10):
     try:
         from backend.db_orm import orm_available
         if orm_available():
-            tickets = _orm_list_tickets(limit)
+            tickets = await _run_blocking(_orm_list_tickets, limit, timeout=6.0)
         else:
             from tickets import get_tickets
-            tickets = get_tickets(limit=limit)
+            tickets = await _run_blocking(get_tickets, limit, timeout=6.0)
         return [TicketResponse(**t) for t in tickets]
+    except asyncio.TimeoutError:
+        # Fail soft instead of hanging the whole API worker.
+        return []
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -350,11 +359,13 @@ async def get_all_tickets_list():
     try:
         from backend.db_orm import orm_available
         if orm_available():
-            tickets = _orm_list_all_tickets()
+            tickets = await _run_blocking(_orm_list_all_tickets, timeout=6.0)
         else:
             from tickets import get_all_tickets
-            tickets = get_all_tickets()
+            tickets = await _run_blocking(get_all_tickets, timeout=6.0)
         return [TicketResponse(**t) for t in tickets]
+    except asyncio.TimeoutError:
+        return []
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -406,8 +417,21 @@ async def get_dashboard_statistics():
     """Dashboard statistics — always uses tickets.py compute logic."""
     try:
         from tickets import get_dashboard_stats
-        stats = get_dashboard_stats()
+        stats = await _run_blocking(get_dashboard_stats, timeout=6.0)
         return DashboardStats(**stats)
+    except asyncio.TimeoutError:
+        # Return safe empty stats to keep UI responsive.
+        return DashboardStats(
+            overdue=0,
+            due_today=0,
+            open=0,
+            on_hold=0,
+            unassigned=0,
+            all=0,
+            by_priority={"High": 0, "Medium": 0, "Low": 0},
+            by_status={"Open": 0, "Pending": 0, "Resolved": 0, "Closed": 0},
+            by_category={"Network": 0, "Software": 0, "Hardware": 0, "Other": 0},
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

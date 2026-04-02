@@ -727,7 +727,6 @@ export default function Dashboard({ onBack, darkMode }) {
     stats.open    > 0 && { icon: '📬', text: `${stats.open} open tickets`,     color: '#3b82f6' },
   ].filter(Boolean) : [], [sla, stats])
 
-  // ── Loading ──
   if (loading) return (
     <div className={`db-shell ${darkMode ? 'dark' : 'light'}`}>
       <div className="db-center">
@@ -737,7 +736,6 @@ export default function Dashboard({ onBack, darkMode }) {
     </div>
   )
 
-  // ── Error ──
   if (error) return (
     <div className={`db-shell ${darkMode ? 'dark' : 'light'}`}>
       <div className="db-center">
@@ -769,10 +767,17 @@ export default function Dashboard({ onBack, darkMode }) {
 
         <nav className="sb-nav">
           {NAV_ITEMS.map(item => (
-            <button key={item.key} className={`nav-item ${activeTab === item.key ? 'active' : ''}`}
-              onClick={() => setActiveTab(item.key)} title={collapsed ? item.label : undefined}>
+            <button key={item.key}
+              className={`nav-item ${activeTab === item.key ? 'active' : ''}`}
+              onClick={() => setActiveTab(item.key)}
+              title={collapsed ? item.label : undefined}>
               <span className="nav-icon">{item.icon}</span>
-              {!collapsed && <><span className="nav-lbl">{item.label}</span>{activeTab === item.key && <span className="nav-pip" />}</>}
+              {!collapsed && (
+                <>
+                  <span className="nav-lbl">{item.label}</span>
+                  {activeTab === item.key && <span className="nav-pip" />}
+                </>
+              )}
             </button>
           ))}
         </nav>
@@ -809,7 +814,7 @@ export default function Dashboard({ onBack, darkMode }) {
             </div>
 
             <div className="notif-wrap">
-              <button className="icon-btn" onClick={() => setShowNotif(n => !n)}>
+              <button className="icon-btn" onClick={() => setShowNotif(n => !n)} title="Notifications">
                 🔔
                 {notifs.length > 0 && <span className="notif-pip">{notifs.length}</span>}
               </button>

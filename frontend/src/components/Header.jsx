@@ -1,6 +1,6 @@
 import './Header.css'
 
-function Header({ onDashboardClick, darkMode, onToggleTheme }) {
+function Header({ onDashboardClick, darkMode, onToggleTheme, showDashboard }) {
   return (
     <div className="header">
       <div className="header-left">
@@ -9,8 +9,12 @@ function Header({ onDashboardClick, darkMode, onToggleTheme }) {
         </div>
       </div>
       <div className="header-center">
-        <h1 className="header-title">Cognida.ai IT Help Desk Chatbot</h1>
-        <p className="header-tagline">Powered by RAG &amp; Groq LLM</p>
+        <h1 className="header-title">
+          {showDashboard ? 'Cognida.ai IT Ticket Dashboard' : 'Cognida.ai IT Help Desk Chatbot'}
+        </h1>
+        <p className="header-tagline">
+          {showDashboard ? 'Real-time helpdesk analytics & management' : 'Powered by RAG & Groq LLM'}
+        </p>
       </div>
       <div className="header-right flex items-center gap-2">
         {/* Dark / Light toggle */}

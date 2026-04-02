@@ -47,7 +47,12 @@ function ChatApp() {
 
   return (
     <div className={`app${darkMode ? '' : ' light-mode'}`}>
-      <Header onDashboardClick={handleDashboardToggle} darkMode={darkMode} onToggleTheme={toggleTheme} />
+      <Header
+        onDashboardClick={handleDashboardToggle}
+        darkMode={darkMode}
+        onToggleTheme={toggleTheme}
+        showDashboard={showDashboard}
+      />
       <div className="app-container">
         <Sidebar
           messages={messages}

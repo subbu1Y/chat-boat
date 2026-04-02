@@ -53,7 +53,7 @@
 .db-shell {
   display: flex;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   background: var(--db-bg);
   color: var(--db-text);
   font-family: inherit;
@@ -191,52 +191,149 @@
 .sb-user { font-size: 13px; font-weight: 600; color: #fff; margin: 0; line-height: 1.4; }
 .sb-role { font-size: 11px; color: rgba(255,255,255,0.55); margin: 0; }
 
-/* ── Topbar ───────────────────────────────────────────────── */
-.db-topbar {
+/* ── Cognida Branded header bar ───────────────────────────── */
+.db-brand-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  padding: 0 22px;
-  height: 62px;
+  gap: 16px;
+  padding: 0 24px;
+  height: 66px;
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  flex-shrink: 0;
+  box-shadow: 0 2px 14px rgba(90,103,216,0.4);
+}
+
+.db-brand-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.db-brand-logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+}
+
+.db-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.db-brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.db-brand-sub {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1;
+}
+
+.db-brand-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.db-back-btn {
+  padding: 7px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.db-back-btn:hover { background: rgba(255,255,255,0.28); border-color: rgba(255,255,255,0.7); }
+
+/* ── Tab navigation bar ───────────────────────────────────── */
+.db-tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 20px;
+  height: 48px;
   background: var(--db-tb-bg);
   border-bottom: 1px solid var(--db-tb-border);
   backdrop-filter: blur(14px);
   flex-shrink: 0;
 }
 
-.tb-left { display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
-.tb-title { font-size: 19px; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
-.tb-sub   { font-size: 11.5px; color: var(--db-dim-color); }
-
-.tb-right {
+.db-tab-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--db-text-m);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  position: relative;
+  height: 100%;
+}
+.db-tab-btn:hover  { background: rgba(99,102,241,0.08); color: #6366f1; }
+.db-tab-btn.active { color: #6366f1; font-weight: 700; background: rgba(99,102,241,0.08); }
+.db-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 8px; right: 8px;
+  height: 2px;
+  background: #6366f1;
+  border-radius: 2px 2px 0 0;
 }
 
+.db-tab-refresh {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--db-dim-color);
+  white-space: nowrap;
+}
+
+/* ── Search bar (on brand bar — white style) ──────────────── */
 .tb-search {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--db-input-bg);
-  border: 1px solid var(--db-border);
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.35);
   border-radius: 10px;
   padding: 7px 12px;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
 }
-.tb-search:focus-within { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.12); }
+.tb-search:focus-within {
+  background: rgba(255,255,255,0.28);
+  border-color: rgba(255,255,255,0.7);
+}
 
 .tb-input {
   background: transparent;
   border: none;
   outline: none;
   font-size: 13px;
-  color: var(--db-text);
-  width: 170px;
+  color: #fff;
+  width: 190px;
 }
-.tb-input::placeholder { color: var(--db-dim-color); }
+.tb-input::placeholder { color: rgba(255,255,255,0.62); }
 
+/* ── Icon button (default + white variant for brand bar) ──── */
 .icon-btn {
   position: relative;
   width: 36px;
@@ -254,6 +351,18 @@
   flex-shrink: 0;
 }
 .icon-btn:hover { border-color: #6366f1; box-shadow: var(--db-glow); }
+
+/* White variant for use on the Cognida blue header */
+.icon-btn--white {
+  border-color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+.icon-btn--white:hover {
+  border-color: rgba(255,255,255,0.7) !important;
+  background: rgba(255,255,255,0.28) !important;
+  box-shadow: none !important;
+}
 
 .notif-pip {
   position: absolute;

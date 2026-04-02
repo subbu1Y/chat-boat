@@ -1186,12 +1186,12 @@ export default function HelpdeskPortal() {
 
         {/* Logo + Theme Toggle */}
         <div className="px-5 py-6" style={{borderBottom: `1px solid ${C.sideBorder}`}}>
-          <div className="flex flex-col items-center gap-2 mb-3">
-            <img src="/logo.png" alt="Cognida" className="h-12 w-auto"
+          <div className="flex flex-col items-center gap-3 mb-3">
+            <img src="/logo.png" alt="Cognida" className="h-16 w-auto max-w-[200px] object-contain"
               onError={e => { e.target.style.display='none' }} />
             <div className="text-center">
-              <h1 className="font-bold text-base leading-tight" style={{color: C.sideText}}>Cognida.ai</h1>
-              <p className="text-xs" style={{color: C.sideMuted}}>IT Helpdesk Portal</p>
+              <h1 className="font-bold text-xl leading-tight tracking-tight" style={{color: C.sideText}}>Cognida.ai</h1>
+              <p className="text-sm mt-1" style={{color: C.sideMuted}}>IT Helpdesk Portal</p>
             </div>
           </div>
           {/* Theme toggle in sidebar top-left area */}
@@ -1248,13 +1248,13 @@ export default function HelpdeskPortal() {
       <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* Top bar */}
-        <div className="flex items-center justify-between px-6 py-3 flex-shrink-0" style={{background: C.topbar, borderBottom: `1px solid ${C.sideBorder}`}}>
+        <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{background: C.topbar, borderBottom: `1px solid ${C.sideBorder}`}}>
           <div>
-            <h2 className="text-base font-bold" style={{color: C.topbarText}}>{activeNav?.icon} {activeNav?.label}</h2>
-            <p className="text-xs" style={{color: C.topbarMuted}}>{activeNav?.desc}</p>
+            <h2 className="text-xl font-bold tracking-tight" style={{color: C.topbarText}}>{activeNav?.icon} {activeNav?.label}</h2>
+            <p className="text-sm mt-0.5" style={{color: C.topbarMuted}}>{activeNav?.desc}</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium" style={{background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.25)'}}>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.25)'}}>
               🏠 Cognida.ai Helpdesk Portal
             </div>
             {/* Theme toggle in top-right corner */}

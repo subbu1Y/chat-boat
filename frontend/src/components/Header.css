@@ -1,146 +1,157 @@
+/* ════════════════════════════════════════════════════════════════
+   HEADER — Glassmorphism bar, 3-column grid for true centering
+════════════════════════════════════════════════════════════════ */
 .header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 1rem;
+  padding: 0.6rem 1.25rem;
+  min-height: 72px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  /* Cognida brand gradient */
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 4px 24px rgba(90,103,216,0.45);
+  color: white;
+}
+
+/* Light mode — keep same Cognida gradient */
+.light-mode .header {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  border-bottom-color: rgba(255,255,255,0.12);
+  box-shadow: 0 4px 24px rgba(90,103,216,0.45);
+  color: white;
+}
+
+/* ── Columns ── */
+.header-left  { justify-self: start; align-self: center; min-width: 0; }
+.header-center {
+  text-align: center;
+  justify-self: center;
+  max-width: min(90vw, 680px);
+  padding: 0.25rem 0;
+}
+.header-right {
+  justify-self: end;
+  align-self: center;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 1.5rem;
-  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-  color: white;
-  box-shadow: 0 4px 18px rgba(90, 103, 216, 0.28);
-  min-height: 62px;
-  flex-shrink: 0;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
-.header-content {
-  position: relative;
-  flex: 1;
-  text-align: center;
-  padding: 0.6rem 0;
-}
-
-.header-logo {
-  position: absolute;
-  top: 12px;
-  left: 0;
-}
-
+/* ── Logo ── */
 .header-logo img {
-  height: 42px;
+  height: 52px;
   width: auto;
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));
 }
 
+/* ── Title ── */
 .header-title {
-  font-size: 1.25rem;
+  font-size: clamp(1.1rem, 2vw, 1.55rem);
   font-weight: 700;
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.022em;
+  line-height: 1.2;
+  color: inherit;
 }
 
 .header-tagline {
-  margin: 0;
-  font-size: 0.75rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
   opacity: 0.75;
+  font-weight: 400;
 }
 
+/* ── Dashboard button ── */
 .dashboard-btn {
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.92);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 10px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, transform 0.14s;
+  font-family: inherit;
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.light-mode .dashboard-btn {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border-color: rgba(255,255,255,0.28);
 }
 
 .dashboard-btn:hover {
-  background: rgba(255, 255, 255, 0.28);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.4);
+  transform: translateY(-1px);
 }
 
-/* ── Raise a Ticket — highlighted CTA ── */
-.raise-ticket-btn {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 18px;
-  background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  box-shadow: 0 3px 14px rgba(245, 158, 11, 0.5);
-  transition: all 0.2s;
-  animation: pulse-glow 2.5s ease-in-out infinite;
+.light-mode .dashboard-btn:hover {
+  background: rgba(255,255,255,0.28);
+  border-color: rgba(255,255,255,0.48);
 }
 
-.raise-ticket-btn:hover {
-  transform: scale(1.06);
-  box-shadow: 0 5px 20px rgba(245, 158, 11, 0.65);
-  color: #ffffff;
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 3px 14px rgba(245, 158, 11, 0.45); }
-  50%       { box-shadow: 0 3px 22px rgba(245, 158, 11, 0.75); }
-}
-
+/* ── Theme toggle ── */
 .theme-toggle-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.88);
+  border: 1px solid rgba(255,255,255,0.16);
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.18s, border-color 0.18s;
+  font-family: inherit;
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.light-mode .theme-toggle-btn {
+  background: rgba(255,255,255,0.12);
+  color: white;
+  border-color: rgba(255,255,255,0.25);
 }
 
 .theme-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.42);
 }
 
-/* Light mode — header keeps the Cognida blue gradient in both modes */
-.light-mode .header {
-  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-  color: white;
-  box-shadow: 0 4px 18px rgba(90, 103, 216, 0.28);
+.light-mode .theme-toggle-btn:hover {
+  background: rgba(255,255,255,0.25);
 }
 
+/* ── Responsive ── */
 @media (max-width: 768px) {
   .header {
-    padding: 0 1rem;
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    row-gap: 0.5rem;
+    padding: 0.65rem 0.75rem;
     min-height: auto;
+    justify-items: center;
   }
-  
-  .header-logo img {
-    height: 45px;
-  }
-  
-  .header-title {
-    font-size: 1.35rem;
-  }
-  
-  .header-tagline {
-    font-size: 0.7rem;
-    right: 12px;
-    bottom: 10px;
-  }
-  
-  .dashboard-btn {
-    margin-top: 10px;
-  }
+  .header-left  { display: none; }
+  .header-center { order: 1; max-width: 100%; }
+  .header-right  { order: 2; justify-self: stretch; justify-content: center; width: 100%; }
+  .header-title  { font-size: 1.1rem; }
 }

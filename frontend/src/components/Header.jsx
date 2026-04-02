@@ -1,17 +1,18 @@
-import { Link } from 'react-router-dom'
 import './Header.css'
 
 function Header({ onDashboardClick, darkMode, onToggleTheme }) {
   return (
     <div className="header">
-      <div className="header-content">
+      <div className="header-left">
         <div className="header-logo">
           <img src="/logo.png" alt="Cognida" />
         </div>
+      </div>
+      <div className="header-center">
         <h1 className="header-title">Cognida.ai IT Help Desk Chatbot</h1>
         <p className="header-tagline">Powered by RAG &amp; Groq LLM</p>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="header-right flex items-center gap-2">
         {/* Dark / Light toggle */}
         <button
           onClick={onToggleTheme}
@@ -45,5 +46,6 @@ function Header({ onDashboardClick, darkMode, onToggleTheme }) {
     </div>
   )
 }
+
 
 export default Header

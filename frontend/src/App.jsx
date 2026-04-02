@@ -57,11 +57,12 @@ function ChatApp() {
         />
         <div className="main-content">
           {showDashboard ? (
-            <Dashboard onBack={() => setShowDashboard(false)} />
+            <Dashboard onBack={() => setShowDashboard(false)} darkMode={darkMode} />
           ) : showTicketForm ? (
             <TicketForm onClose={() => setShowTicketForm(false)} />
           ) : (
             <Chat
+              darkMode={darkMode}
               messages={messages}
               setMessages={setMessages}
               onCreateTicket={handleTicketFormToggle}

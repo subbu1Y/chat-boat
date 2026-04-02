@@ -864,6 +864,66 @@ async def get_dashboard_statistics():
         raise HTTPException(status_code=500, detail=str(exc))
 
 
+@app.get("/api/dashboard/activity", tags=["Dashboard"])
+async def get_dashboard_activity(limit: int = 20):
+    """
+    Return a recent-activity timeline derived from ticket data.
+    Each event has: id, type, icon, text, sub, time, color.
+    Falls back to an empty list on error rather than 500.
+    """
+    try:
+        from backend.db_orm import orm_available
+
+        if orm_available():
+            tickets = await _run_blocking(_orm_list_all_tickets, timeout=6.0)
+        else:
+            from tickets import get_all_tickets
+            tickets = await _run_blocking(get_all_tickets, timeout=6.0)
+
+        STATUS_COLORS = {
+            "Open":     "#3b82f6",
+            "Pending":  "#f59e0b",
+            "Resolved": "#06b6d4",
+            "Closed":   "#22c55e",
+        }
+
+        events: list[dict] = []
+        sorted_tickets = sorted(
+            tickets,
+            key=lambda t: t.get("created_at", ""),
+            reverse=True,
+        )
+        for t in sorted_tickets[:limit]:
+            events.append({
+                "id":    t.get("id", "") + "_created",
+                "type":  "created",
+                "icon":  "🎫",
+                "color": "#3b82f6",
+                "text":  f"Ticket {t.get('id', '')} created",
+                "sub":   (t.get("subject", "") or "")[:60],
+                "time":  t.get("created_at", ""),
+            })
+            status = t.get("status", "")
+            if status in ("Resolved", "Closed"):
+                events.append({
+                    "id":    t.get("id", "") + "_" + status.lower(),
+                    "type":  status.lower(),
+                    "icon":  "✅" if status == "Closed" else "🔧",
+                    "color": STATUS_COLORS.get(status, "#6366f1"),
+                    "text":  f"Ticket {t.get('id', '')} {status.lower()}",
+                    "sub":   (t.get("resolution") or t.get("subject", "") or "")[:60],
+                    "time":  t.get("created_at", ""),
+                })
+
+        events.sort(key=lambda e: e["time"], reverse=True)
+        return {"events": events[:limit]}
+
+    except asyncio.TimeoutError:
+        return {"events": []}
+    except Exception as exc:
+        return {"events": [], "error": str(exc)}
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Routes – Auth
 # ─────────────────────────────────────────────────────────────────────────────

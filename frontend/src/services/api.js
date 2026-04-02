@@ -87,8 +87,10 @@ export const getAllTickets = async () => {
   return response.data;
 };
 
-export const updateTicketStatus = async (ticketId, status) => {
-  const response = await api.patch(`/tickets/${ticketId}/status`, { status });
+export const updateTicketStatus = async (ticketId, status, resolution = null) => {
+  const body = { status };
+  if (resolution) body.resolution = resolution;
+  const response = await api.patch(`/tickets/${ticketId}/status`, body);
   return response.data;
 };
 

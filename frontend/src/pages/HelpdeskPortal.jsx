@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { createHelpdeskTicket, getMyTickets, trackTicket, createQuickTicket } from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import { EMPLOYEE_DIRECTORY } from '../config/employees'
@@ -783,8 +784,8 @@ function SuccessScreen({ ticket, form, screenshots, onReset, C }) {
 }
 
 // ─── My Tickets View ─────────────────────────────────────────────────────────
-function MyTicketsView({ ticketType, title, C }) {
-  const [email, setEmail]       = useState('')
+function MyTicketsView({ ticketType, title, C, autoEmail }) {
+  const [email, setEmail]       = useState(autoEmail || '')
   const [trackId, setTrackId]   = useState('')
   const [tickets, setTickets]   = useState([])
   const [tracked, setTracked]   = useState(null)
@@ -796,15 +797,22 @@ function MyTicketsView({ ticketType, title, C }) {
 
   const IS = { background: C.inputBg, borderColor: C.inputBorder, color: C.inputText }
 
-  const search = async () => {
-    if (!email.trim() || !email.includes('@')) { setError('Enter a valid email.'); return }
+  const search = async (emailOverride) => {
+    const target = (emailOverride || email).trim()
+    if (!target || !target.includes('@')) { setError('Enter a valid email.'); return }
     setError(''); setLoading(true); setSearched(false)
     try {
-      const res = await getMyTickets(email.trim(), ticketType)
+      const res = await getMyTickets(target, ticketType)
       setTickets(res); setSearched(true)
     } catch { setError('Failed to fetch tickets. Make sure the backend is running.') }
     finally { setLoading(false) }
   }
+
+  // Auto-load tickets when the user's email is known
+  useEffect(() => {
+    if (autoEmail) search(autoEmail)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoEmail])
 
   const track = async () => {
     if (!trackId.trim()) { setTE('Enter a ticket ID (e.g. TKT-1000)'); return }
@@ -864,17 +872,33 @@ function MyTicketsView({ ticketType, title, C }) {
       {/* Search by email */}
       <div style={{background: C.card, borderColor: C.cardBorder}} className="rounded-2xl shadow border p-5">
         <h3 style={{color: C.text}} className="text-sm font-bold mb-3">📋 View All My {title}</h3>
-        <div className="flex gap-2">
-          <input type="email" value={email} onChange={e=>setEmail(e.target.value)}
-            onKeyDown={e=>e.key==='Enter'&&search()}
-            placeholder="Enter your work email"
-            style={IS} className="flex-1 border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          <button onClick={search} disabled={loading}
-            className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2">
-            {loading ? <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg> : null}
-            Search
-          </button>
-        </div>
+        {autoEmail ? (
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm flex-1"
+              style={{background: C.inputBg, border: `1px solid ${C.inputBorder}`, color: C.inputText}}>
+              <span className="text-green-500">✓</span>
+              <span className="font-medium">{autoEmail}</span>
+              <span className="text-xs ml-auto px-2 py-0.5 rounded-full bg-green-100 text-green-700">Signed in</span>
+            </div>
+            <button onClick={() => search()} disabled={loading}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2">
+              {loading ? <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg> : '🔄'}
+              Refresh
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2 mb-3">
+            <input type="email" value={email} onChange={e=>setEmail(e.target.value)}
+              onKeyDown={e=>e.key==='Enter'&&search()}
+              placeholder="Enter your work email"
+              style={IS} className="flex-1 border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            <button onClick={() => search()} disabled={loading}
+              className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2">
+              {loading ? <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg> : null}
+              Search
+            </button>
+          </div>
+        )}
         {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
 
         {searched && tickets.length === 0 && (
@@ -1145,6 +1169,9 @@ function ThemeToggle({ darkMode, onToggle, C }) {
 }
 
 export default function HelpdeskPortal() {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
   const [view, setView]               = useState('incident')
   const [successData, setSuccessData] = useState(null)
   const [formKey, setFormKey]         = useState(0)
@@ -1155,6 +1182,43 @@ export default function HelpdeskPortal() {
   })
 
   const C = darkMode ? DARK : LIGHT
+
+  const handleLogout = () => {
+    logout()
+    navigate('/auth/login', { replace: true })
+  }
+
+  // ── My Tickets navbar panel ───────────────────────────────────────────────
+  const [showMyTickets, setShowMyTickets]         = useState(false)
+  const [myTickets, setMyTickets]                 = useState([])
+  const [myTicketsLoading, setMyTicketsLoading]   = useState(false)
+  const myTicketsBtnRef                           = useRef(null)
+
+  const loadMyTickets = useCallback(async () => {
+    if (!user?.email) return
+    setMyTicketsLoading(true)
+    try {
+      const res = await getMyTickets(user.email)
+      setMyTickets(res)
+    } catch {}
+    finally { setMyTicketsLoading(false) }
+  }, [user?.email])
+
+  useEffect(() => { loadMyTickets() }, [loadMyTickets])
+
+  // Close the panel when clicking outside
+  useEffect(() => {
+    if (!showMyTickets) return
+    const handler = (e) => {
+      if (myTicketsBtnRef.current && !myTicketsBtnRef.current.contains(e.target))
+        setShowMyTickets(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showMyTickets])
+
+  const openTickets   = myTickets.filter(t => !['Closed', 'Resolved'].includes(t.status))
+  const openCount     = openTickets.length
 
   const toggleTheme = () => setDarkMode(d => {
     const next = !d
@@ -1170,8 +1234,8 @@ export default function HelpdeskPortal() {
     switch (view) {
       case 'incident':     return <TicketForm key={formKey} ticketType="incident"        catalog={INCIDENT_CATALOG} onSuccess={handleSuccess} C={C} />
       case 'service':      return <TicketForm key={formKey} ticketType="service_request" catalog={SERVICE_CATALOG}  onSuccess={handleSuccess} C={C} />
-      case 'my-incidents': return <MyTicketsView ticketType="incident"        title="Past Incidents" C={C} />
-      case 'my-service':   return <MyTicketsView ticketType="service_request" title="Past Service Requests" C={C} />
+      case 'my-incidents': return <MyTicketsView ticketType="incident"        title="Past Incidents"        C={C} autoEmail={user?.email} />
+      case 'my-service':   return <MyTicketsView ticketType="service_request" title="Past Service Requests" C={C} autoEmail={user?.email} />
       default:             return null
     }
   }
@@ -1238,9 +1302,32 @@ export default function HelpdeskPortal() {
           ))}
         </nav>
 
-        {/* Footer */}
-        <div className="p-4" style={{borderTop: `1px solid ${C.sideBorder}`}}>
-          <p className="text-xs text-center" style={{color: C.sideFooter}}>© 2026 Cognida.ai</p>
+        {/* Footer — user info + logout */}
+        <div className="p-3" style={{borderTop: `1px solid ${C.sideBorder}`}}>
+          {user && (
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                style={{background: 'rgba(255,255,255,0.2)', color: C.sideText}}>
+                {user.name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold truncate" style={{color: C.sideText}}>{user.name}</p>
+                <p className="text-xs truncate" style={{color: C.sideMuted, textTransform: 'capitalize'}}>{user.role}</p>
+              </div>
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold transition-all hover:opacity-90 active:scale-95"
+            style={{
+              background: 'rgba(239,68,68,0.15)',
+              border: '1px solid rgba(239,68,68,0.35)',
+              color: '#fca5a5',
+            }}
+          >
+            ⏻ Logout
+          </button>
+          <p className="text-xs text-center mt-2" style={{color: C.sideFooter}}>© 2026 Cognida.ai</p>
         </div>
       </div>
 
@@ -1254,10 +1341,101 @@ export default function HelpdeskPortal() {
             <p className="text-sm mt-0.5" style={{color: C.topbarMuted}}>{activeNav?.desc}</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.25)'}}>
-              🏠 Cognida.ai Helpdesk Portal
+
+            {/* ── My Tickets bucket ── */}
+            <div className="relative" ref={myTicketsBtnRef}>
+              <button
+                onClick={() => setShowMyTickets(v => !v)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:opacity-90 active:scale-95"
+                style={{background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.28)'}}
+              >
+                🎫 My Tickets
+                {openCount > 0 && (
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold"
+                    style={{background: '#ef4444', color: '#fff'}}>
+                    {openCount}
+                  </span>
+                )}
+                {myTicketsLoading && (
+                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                  </svg>
+                )}
+              </button>
+
+              {/* Dropdown panel */}
+              {showMyTickets && (
+                <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl shadow-2xl z-50 overflow-hidden"
+                  style={{background: C.card, border: `1px solid ${C.cardBorder}`}}>
+
+                  {/* Panel header */}
+                  <div className="flex items-center justify-between px-4 py-3"
+                    style={{background: 'linear-gradient(135deg,#5a67d8 0%,#6b46c1 100%)'}}>
+                    <div>
+                      <p className="text-sm font-bold text-white">🎫 My Tickets</p>
+                      <p className="text-xs text-white/70">{myTickets.length} total · {openCount} open</p>
+                    </div>
+                    <button
+                      onClick={() => { setShowMyTickets(false); setView('my-incidents'); setSuccessData(null) }}
+                      className="text-xs font-semibold text-white/80 hover:text-white underline"
+                    >
+                      View All
+                    </button>
+                  </div>
+
+                  {/* Ticket list */}
+                  <div className="max-h-72 overflow-y-auto">
+                    {myTicketsLoading ? (
+                      <div className="flex justify-center py-8">
+                        <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24" style={{color:'#6366f1'}}>
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                        </svg>
+                      </div>
+                    ) : myTickets.length === 0 ? (
+                      <div className="text-center py-8">
+                        <div className="text-3xl mb-1">📭</div>
+                        <p className="text-xs" style={{color: C.dim}}>No tickets raised yet.</p>
+                      </div>
+                    ) : (
+                      myTickets.slice(0, 8).map(t => (
+                        <div key={t.id} className="flex items-start gap-3 px-4 py-3"
+                          style={{borderBottom: `1px solid ${C.cardBorder}`}}>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="font-mono text-xs font-bold text-indigo-500">{t.id}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${STATUS_COLORS[t.status]||'bg-gray-100 text-gray-600'}`}>{t.status}</span>
+                            </div>
+                            <p className="text-xs font-medium truncate" style={{color: C.text}}>{t.subject}</p>
+                            <p className="text-xs mt-0.5" style={{color: C.dim}}>{new Date(t.created_at).toLocaleDateString()}</p>
+                          </div>
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${PRIORITY_COLORS[t.priority]||''}`}>{t.priority}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Refresh footer */}
+                  <div className="px-4 py-2 flex justify-between items-center"
+                    style={{borderTop: `1px solid ${C.cardBorder}`}}>
+                    <button onClick={loadMyTickets}
+                      className="text-xs font-semibold hover:opacity-80 flex items-center gap-1"
+                      style={{color: '#6366f1'}}>
+                      🔄 Refresh
+                    </button>
+                    <button
+                      onClick={() => { setShowMyTickets(false); setView('my-service'); setSuccessData(null) }}
+                      className="text-xs font-semibold hover:opacity-80"
+                      style={{color: '#6366f1'}}>
+                      Service Requests →
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-            {/* Theme toggle in top-right corner */}
+
+            {/* Theme toggle */}
             <ThemeToggle darkMode={darkMode} onToggle={toggleTheme} C={C} />
           </div>
         </div>

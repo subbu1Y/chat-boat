@@ -69,6 +69,18 @@
   min-width: 0;
 }
 
+/* ── Topbar (title only) ──────────────────────────────────── */
+.db-topbar {
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--db-border);
+  flex-shrink: 0;
+}
+.tb-left  { display: flex; flex-direction: column; gap: 2px; }
+.tb-title { font-size: 20px; font-weight: 700; color: var(--db-text); margin: 0; }
+.tb-sub   { font-size: 12px; color: var(--db-dim-color); }
+
 /* ── Center utility ───────────────────────────────────────── */
 .db-center {
   display: flex;
@@ -100,10 +112,101 @@
 .sb-top {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 18px 14px 14px;
+  gap: 8px;
+  padding: 14px 10px 12px;
   border-bottom: 1px solid rgba(255,255,255,0.1);
   flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* Notification + Refresh icons group inside sidebar header */
+.sb-hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+.sb-hdr-actions .icon-btn {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
+}
+.sb-hdr-actions .icon-btn:hover {
+  background: rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: none;
+}
+
+/* Notification panel anchored to left inside sidebar */
+.sb-hdr-actions .notif-panel {
+  left: 0;
+  right: auto;
+  top: calc(100% + 6px);
+  width: 230px;
+}
+
+/* Search box inside sidebar */
+.sb-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 10px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.sb-search-wrap:focus-within {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.4);
+}
+.sb-search-icon { font-size: 13px; flex-shrink: 0; }
+.sb-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: #fff;
+  min-width: 0;
+}
+.sb-search-input::placeholder { color: rgba(255,255,255,0.5); }
+
+.sb-search-collapsed {
+  margin: 6px auto;
+  display: flex;
+}
+
+/* ← Back to Chat button in sidebar */
+.sb-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 4px 10px 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.8);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  width: calc(100% - 20px);
+}
+.sb-back-btn:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.4);
+  color: #fff;
 }
 
 .sb-title {
@@ -175,6 +278,7 @@
   border-top: 1px solid rgba(255,255,255,0.1);
   flex-shrink: 0;
 }
+.sb-foot-info { flex: 1; min-width: 0; overflow: hidden; }
 .sb-av {
   width: 32px;
   height: 32px;
@@ -188,8 +292,25 @@
   color: #fff;
   flex-shrink: 0;
 }
-.sb-user { font-size: 13px; font-weight: 600; color: #fff; margin: 0; line-height: 1.4; }
-.sb-role { font-size: 11px; color: rgba(255,255,255,0.55); margin: 0; }
+.sb-user { font-size: 13px; font-weight: 600; color: #fff; margin: 0; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-role { font-size: 11px; color: rgba(255,255,255,0.55); margin: 0; text-transform: capitalize; }
+.sb-logout-btn {
+  flex-shrink: 0;
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.35);
+  color: #fca5a5;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.sb-logout-btn:hover {
+  background: rgba(239,68,68,0.35);
+  color: #fff;
+}
 
 /* ── Cognida Branded header bar ───────────────────────────── */
 .db-brand-bar {

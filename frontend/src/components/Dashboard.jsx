@@ -5,6 +5,8 @@
  *           activity timeline, notifications, dark-mode, closing-resolution modal.
  */
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { getDashboardStats, getAllTickets, updateTicketStatus } from '../services/api'
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -679,6 +681,9 @@ const NAV_ITEMS = [
 ]
 
 export default function Dashboard({ onBack, darkMode }) {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
   const [stats,     setStats]     = useState(null)
   const [tickets,   setTickets]   = useState([])
   const [loading,   setLoading]   = useState(true)
@@ -688,6 +693,15 @@ export default function Dashboard({ onBack, darkMode }) {
   const [topSearch, setTopSearch] = useState('')
   const [showNotif, setShowNotif] = useState(false)
   const [lastRef,   setLastRef]   = useState(new Date())
+
+  const handleLogout = () => {
+    logout()
+    navigate('/auth/login', { replace: true })
+  }
+
+  const displayName  = user?.name  || 'IT Admin'
+  const displayRole  = user?.role  || 'Helpdesk'
+  const avatarLetter = displayName.charAt(0).toUpperCase()
 
   useEffect(() => { loadDashboard() }, [])
 
@@ -763,56 +777,8 @@ export default function Dashboard({ onBack, darkMode }) {
             {collapsed ? '›' : '‹'}
           </button>
           {!collapsed && <span className="sb-title">Helpdesk</span>}
-        </div>
-
-        <nav className="sb-nav">
-          {NAV_ITEMS.map(item => (
-            <button key={item.key}
-              className={`nav-item ${activeTab === item.key ? 'active' : ''}`}
-              onClick={() => setActiveTab(item.key)}
-              title={collapsed ? item.label : undefined}>
-              <span className="nav-icon">{item.icon}</span>
-              {!collapsed && (
-                <>
-                  <span className="nav-lbl">{item.label}</span>
-                  {activeTab === item.key && <span className="nav-pip" />}
-                </>
-              )}
-            </button>
-          ))}
-        </nav>
-
-        {!collapsed && (
-          <div className="sb-foot">
-            <div className="sb-av">IT</div>
-            <div>
-              <p className="sb-user">IT Admin</p>
-              <p className="sb-role">Helpdesk</p>
-            </div>
-          </div>
-        )}
-      </aside>
-
-      {/* ── Main ── */}
-      <div className="db-main">
-
-        {/* Topbar */}
-        <header className="db-topbar">
-          <div className="tb-left">
-            <h1 className="tb-title">
-              {NAV_ITEMS.find(n => n.key === activeTab)?.icon}&nbsp;
-              {NAV_ITEMS.find(n => n.key === activeTab)?.label}
-            </h1>
-            <span className="tb-sub">Updated {lastRef.toLocaleTimeString()}</span>
-          </div>
-
-          <div className="tb-right">
-            <div className="tb-search">
-              <span>🔍</span>
-              <input type="text" placeholder="Quick search tickets…" value={topSearch}
-                onChange={e => handleTopSearch(e.target.value)} className="tb-input" />
-            </div>
-
+          {/* Notification + Refresh icons in header */}
+          <div className="sb-hdr-actions">
             <div className="notif-wrap">
               <button className="icon-btn" onClick={() => setShowNotif(n => !n)} title="Notifications">
                 🔔
@@ -833,9 +799,78 @@ export default function Dashboard({ onBack, darkMode }) {
                 </div>
               )}
             </div>
+            <button className="icon-btn" onClick={loadDashboard} title="Refresh data">🔄</button>
+          </div>
+        </div>
 
-            <button className="icon-btn" onClick={loadDashboard} title="Refresh">🔄</button>
-            <button className="btn-ghost back-btn" onClick={onBack}>← Chat</button>
+        {/* Search — full width when expanded, icon-only when collapsed */}
+        {!collapsed && (
+          <div className="sb-search-wrap">
+            <span className="sb-search-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="Search tickets…"
+              value={topSearch}
+              onChange={e => handleTopSearch(e.target.value)}
+              className="sb-search-input"
+            />
+          </div>
+        )}
+        {collapsed && (
+          <button className="collapse-btn sb-search-collapsed" title="Search" onClick={() => setCollapsed(false)}>🔍</button>
+        )}
+
+        <nav className="sb-nav">
+          {NAV_ITEMS.map(item => (
+            <button key={item.key}
+              className={`nav-item ${activeTab === item.key ? 'active' : ''}`}
+              onClick={() => setActiveTab(item.key)}
+              title={collapsed ? item.label : undefined}>
+              <span className="nav-icon">{item.icon}</span>
+              {!collapsed && (
+                <>
+                  <span className="nav-lbl">{item.label}</span>
+                  {activeTab === item.key && <span className="nav-pip" />}
+                </>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        {/* ← Back to Chat */}
+        <button className="sb-back-btn" onClick={onBack} title="Back to Chat">
+          {collapsed ? '←' : '← Back to Chat'}
+        </button>
+
+        <div className="sb-foot">
+          <div className="sb-av">{avatarLetter}</div>
+          {!collapsed && (
+            <div className="sb-foot-info">
+              <p className="sb-user">{displayName}</p>
+              <p className="sb-role">{displayRole}</p>
+            </div>
+          )}
+          <button
+            className="sb-logout-btn"
+            onClick={handleLogout}
+            title="Logout"
+          >
+            {collapsed ? '⏻' : 'Logout'}
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Main ── */}
+      <div className="db-main">
+
+        {/* Topbar — title only */}
+        <header className="db-topbar">
+          <div className="tb-left">
+            <h1 className="tb-title">
+              {NAV_ITEMS.find(n => n.key === activeTab)?.icon}&nbsp;
+              {NAV_ITEMS.find(n => n.key === activeTab)?.label}
+            </h1>
+            <span className="tb-sub">Updated {lastRef.toLocaleTimeString()}</span>
           </div>
         </header>
 

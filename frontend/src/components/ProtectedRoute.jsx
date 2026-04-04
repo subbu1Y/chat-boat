@@ -1,13 +1,19 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+const ADMIN_ROLES = ['admin', 'super-admin']
+
+function roleHome(role) {
+  return ADMIN_ROLES.includes(role) ? '/dashboard' : '/helpdesk'
+}
+
 /**
  * Wraps a route that requires authentication.
  * - If loading: show spinner
  * - If not logged in: redirect to /auth/login
- * - If `requiredRole` is set and user's role doesn't match: redirect to their default page
+ * - If allowedRoles is set and user's role is not in the list: redirect to their home page
  */
-export default function ProtectedRoute({ children, requiredRole }) {
+export default function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth()
 
   if (loading) {
@@ -26,8 +32,8 @@ export default function ProtectedRoute({ children, requiredRole }) {
 
   if (!user) return <Navigate to="/auth/login" replace />
 
-  if (requiredRole && user.role !== requiredRole) {
-    return <Navigate to={user.role === 'admin' ? '/dashboard' : '/helpdesk'} replace />
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to={roleHome(user.role)} replace />
   }
 
   return children

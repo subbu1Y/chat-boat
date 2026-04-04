@@ -46,7 +46,7 @@ export default function SignUp() {
         role:     form.role,
       })
       login(res.token, res.user)
-      if (res.user.role === 'admin') navigate('/dashboard')
+      if (['admin', 'super-admin'].includes(res.user.role)) navigate('/dashboard')
       else navigate('/helpdesk')
     } catch (err) {
       setError(err?.response?.data?.detail || 'Registration failed. Please try again.')

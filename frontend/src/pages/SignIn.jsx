@@ -27,7 +27,7 @@ export default function SignIn() {
       const res = await loginUser(form.email.trim(), form.password)
       login(res.token, res.user)
       // Route by role
-      if (res.user.role === 'admin') navigate('/dashboard')
+      if (['admin', 'super-admin'].includes(res.user.role)) navigate('/dashboard')
       else navigate('/helpdesk')
     } catch (err) {
       setError(err?.response?.data?.detail || 'Login failed. Check your credentials.')
